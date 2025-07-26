@@ -1,6 +1,7 @@
 package hl7.segments;
 
-public class PidSegment {
+public class PidSegment extends Hl7segment {
+    //listing all segments in PID
     private String setID;
     private String patIdExternal;
     private String patIdInternal;
@@ -63,7 +64,4 @@ public class PidSegment {
         this.patDeathIndicator = get(fields, 30);
     }
 
-    private String get(String[] fields, int index) {
-        return index < fields.length ? fields[index] : null;
-    }
 }
