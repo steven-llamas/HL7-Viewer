@@ -7,7 +7,7 @@ public class Hl7Parse {
 
 
     public Hl7Parse(String message)  {
-        if (message == null) { //simple input validation to check if message is empty
+        if (message == null|| message.trim().isEmpty()) { //simple input validation to check if message is empty
             throw new IllegalArgumentException("HL7 message cannot be null");
         }
         this.message = message;
@@ -74,6 +74,7 @@ public class Hl7Parse {
 
     private String[] getFields(String segments) {
         return segments.split("\\|");
+
     }
 
 
