@@ -1,7 +1,7 @@
 package hl7.segments;
 
 public class PidSegment extends Hl7segment {
-    //listing all segments in PID
+    //listing all fields in PID
     private String setID;
     private String patIdExternal;
     private String patIdInternal;

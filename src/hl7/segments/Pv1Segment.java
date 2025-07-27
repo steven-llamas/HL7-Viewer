@@ -1,7 +1,7 @@
 package hl7.segments;
 
 public class Pv1Segment extends Hl7segment {
-    //listing all segments in PV1
+    //listing all fields in PV1
     private String SetIdPatVisit;
     private String PatClass;
     private String AssignedPatLocation;

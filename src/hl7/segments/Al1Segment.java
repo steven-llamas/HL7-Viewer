@@ -1,6 +1,7 @@
 package hl7.segments;
 
 public class Al1Segment extends Hl7segment {
+    //listing all fields in AL1
     private String setID;
     private String allergyType;
     private String allergyCodeMnemonicDesc;
@@ -9,7 +10,7 @@ public class Al1Segment extends Hl7segment {
     private String identificationDate;
 
 
-    Al1Segment(String[] fields){
+    public Al1Segment(String[] fields){
         this.setID = get(fields, 1);
         this.allergyType = get(fields, 2);
         this.allergyCodeMnemonicDesc = get(fields, 3);

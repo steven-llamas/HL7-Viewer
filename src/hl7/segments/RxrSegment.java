@@ -1,7 +1,7 @@
 package hl7.segments;
 
 public class RxrSegment extends Hl7segment{
-    //listing all segments in RXE
+    //listing all fields in RXE
     private String route;
     private String site;
     private String administrationDevice;

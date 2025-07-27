@@ -1,7 +1,7 @@
 package hl7.segments;
 
 public class MshSegment extends Hl7segment {
-    //listing all segments in MSH
+    //listing all fields in MSH
     // MSH.1 declares field separator to be used( aka "|")
     // which we use in Hl7Parse as "|" is the standard
     private String encodingCharacters;

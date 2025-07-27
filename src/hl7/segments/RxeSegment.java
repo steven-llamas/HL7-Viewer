@@ -1,7 +1,7 @@
 package hl7.segments;
 
 public class RxeSegment extends Hl7segment{
-    //listing all segments in RXE
+    //listing all fields in RXE
     private String QuantityTiming;
     private String GiveCode;
     private String GiveAmountMin;

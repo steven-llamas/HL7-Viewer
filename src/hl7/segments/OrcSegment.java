@@ -2,7 +2,7 @@ package hl7.segments;
 
 
 public class OrcSegment extends Hl7segment{
-    //listing all segments in ORC
+    //listing all fields in ORC
     private String OrderControl;
     private String PlacerOrderNum;
     private String FillerOrderNum;
