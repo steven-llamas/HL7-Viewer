@@ -4,23 +4,24 @@ import hl7.segments.*;
 
 public class Hl7Parse {
     private String message;
+    private MshSegment mshSegment;
 
 
     public Hl7Parse(String message)  {
-        if (message == null|| message.trim().isEmpty()) { //simple input validation to check if message is empty
-            throw new IllegalArgumentException("HL7 message cannot be null");
-        }
         this.message = message;
+        if (!isValidHl7()){
+            throw new IllegalArgumentException("Invalid Hl7 Message. Try Again.");
+        }
         parse();
     }
 
 
     private void parse() {
-        String[] segments = getSegments();
+        String[] segments = splitSegments();
 
         for (String segment : segments) {
             //splitting the string array of segments into fields w "|"
-            String[] fields = getFields(segment);
+            String[] fields = splitFields(segment);
             //segment type "MSH" for ex is always first item in array
             //using Switch statements to check each segment
             //and create new object  for their type
@@ -29,7 +30,7 @@ public class Hl7Parse {
 
             switch (segmentType) {
                 case "MSH":
-                    var msh = new MshSegment(fields);
+                    mshSegment = new MshSegment(fields);
                     break;
 
                 case "PID":
@@ -66,16 +67,26 @@ public class Hl7Parse {
         }
     }
 
-    private String[] getSegments() {
+    private String[] splitSegments() {
         //Splitting Hl7 message into segments by carriage return \ new line
         // returns segments into array of strings
         return this.message.split("[\\r\\n]");
     }
 
-    private String[] getFields(String segments) {
+    private String[] splitFields(String segments) {
         return segments.split("\\|");
 
     }
 
+    private boolean isValidHl7(){
+        if (message.trim().isEmpty() || (!message.regionMatches(0,"MSH",0,3)) ) {
+           return false;
+        }
+        return true;
+    }
+    
+    public Hl7segment getMshSegment(){
+        return mshSegment;
+    }
 
 }

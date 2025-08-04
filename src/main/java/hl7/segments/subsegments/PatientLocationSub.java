@@ -26,5 +26,5 @@ public class PatientLocationSub extends Hl7segment {
             this.floor = get(parts, 7);
             this.locationType = get(parts, 8);
         }
-    }
+}
 

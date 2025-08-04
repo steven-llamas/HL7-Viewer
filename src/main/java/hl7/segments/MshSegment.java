@@ -43,6 +43,77 @@ public class MshSegment extends Hl7segment {
         this.countryCode = get(fields, 16);
         this.characterSet = get(fields, 17);
         this.principalLangOfMessage = get(fields, 18);
+    }
 
+    public String getEncodingCharacters() {
+        return encodingCharacters;
+    }
+
+    public String getSendingApplication() {
+        return sendingApplication;
+    }
+
+    public String getSendingFacility() {
+        return sendingFacility;
+    }
+
+    public String getReceivingApplication() {
+        return receivingApplication;
+    }
+
+    public String getReceivingFacility() {
+        return receivingFacility;
+    }
+
+    public String getDateTimeOfMessage() {
+        return dateTimeOfMessage;
+    }
+
+    public String getSecurity() {
+        return security;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public String getMessageControlId() {
+        return messageControlId;
+    }
+
+    public String getProcessingId() {
+        return processingId;
+    }
+
+    public String getVersionId() {
+        return versionId;
+    }
+
+    public String getSequenceNumber() {
+        return sequenceNumber;
+    }
+
+    public String getContinuationPointer() {
+        return continuationPointer;
+    }
+
+    public String getAcceptAckType() {
+        return acceptAckType;
+    }
+
+    public String getAppAckType() {
+        return appAckType;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public String getCharacterSet() {
+        return characterSet;
+    }
+
+    public String getPrincipalLangOfMessage() {
+        return principalLangOfMessage;
     }
 }

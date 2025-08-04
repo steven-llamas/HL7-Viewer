@@ -1,6 +1,8 @@
 package hl7;
 
-import hl7.gui.Frame;
+import hl7.gui.GuiBase;
+
+import javax.swing.*;
 
 
 public class Main {
@@ -12,11 +14,12 @@ public class Main {
                 "RXE|1^TAB|Amoxicillin 500mg||500|MG|PO|Q8H|||10|D||||||||||20250727120000\n" +
                 "RXR|PO^Oral\n";
 
-
-        var frame = new Frame();
-
-
-
-
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                var GuiBase = new GuiBase();
+                GuiBase.setVisible(true);
+            }
+        });
     }
 }
