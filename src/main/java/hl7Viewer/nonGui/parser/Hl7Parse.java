@@ -6,7 +6,7 @@ import ca.uhn.hl7v2.model.Message;
 
 public class Hl7Parse {
 
-    private Message parsedMessage;
+     private final Message parsedMessage;
 
     public Hl7Parse(String message) throws Exception{
             var context = new DefaultHapiContext();
