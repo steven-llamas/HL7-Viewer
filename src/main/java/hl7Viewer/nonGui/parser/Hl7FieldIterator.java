@@ -46,7 +46,7 @@ public class Hl7FieldIterator {
     }
 
     private static String safeEncode(Type t) {
-        if (t == null) return "";
+        if (t == null) return ""; // Return empty string instead of "null"
 
         try {
             if (t instanceof Varies) {
@@ -60,24 +60,32 @@ public class Hl7FieldIterator {
 
                 for (int i = 0; i < n; i++) {
                     if (i > 0) sb.append("^");
-                    sb.append(safeEncode(comp.getComponent(i)));
+
+                    Type subComponent = comp.getComponent(i);
+                    String encoded = safeEncode(subComponent);
+
+                    //  Prevent "null" string from being appended
+                    sb.append(encoded != null ? encoded : "");
                 }
                 return sb.toString();
             }
             else if (t instanceof Primitive) {
-                return t.encode();
+                String val = t.encode();
+                return val != null ? val : "";  //  Ensure encoded primitive is not null
             }
             else {
-                return t.encode(); // fallback
+                String val = t.encode();
+                return val != null ? val : "";  //Fallback, safe guard
             }
         } catch (Exception e) {
             System.err.println("Error encoding field: " + t.getClass().getSimpleName() + " - " + e);
             try {
-                return t.toString();
+                return t.toString() != null ? t.toString() : "";
             } catch (Exception e2) {
                 System.err.println("Error calling toString on field: " + e2);
                 return "[Error]";
             }
         }
     }
+
 }

@@ -25,9 +25,10 @@ public class GuiBase extends JFrame{
         var iconURL = getClass().getResource("/images/important.jpg");
         var image = new ImageIcon(iconURL);
         setIconImage(image.getImage());
-        //addMenuBar();
+        //adding and setting a menubar to the application
+        setJMenuBar(new MenuBar());
 
-        //creates popup when exiting
+        //creates confirmation popup when exiting
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -46,17 +47,6 @@ public class GuiBase extends JFrame{
         addHl7ViewerComponents();
     }
 
-    private void addMenuBar(){
-        var menuBar = new JMenuBar();
-        menuBar.setBackground(Utilities.SECONDARY_COLOR);
-        menuBar.setBorder(BorderFactory.createEmptyBorder());
-        var menuFile = new JMenu("Shh ");
-        var menuItemExit = new JMenuItem("Exit");
-        menuBar.add(menuFile);
-        setJMenuBar(menuBar);
-
-
-    }
 
     private void addHl7ViewerComponents() {
         var mainPanel = new JPanel(new GridLayout(1, 2));
