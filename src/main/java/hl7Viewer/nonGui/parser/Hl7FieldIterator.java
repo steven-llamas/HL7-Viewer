@@ -41,7 +41,6 @@ public class Hl7FieldIterator {
         } catch (HL7Exception e) {
             e.printStackTrace();
         }
-
         return rows.toArray(new Object[0][0]);
     }
 
@@ -63,7 +62,6 @@ public class Hl7FieldIterator {
 
                     Type subComponent = comp.getComponent(i);
                     String encoded = safeEncode(subComponent);
-
                     //  Prevent "null" string from being appended
                     sb.append(encoded != null ? encoded : "");
                 }
@@ -75,7 +73,7 @@ public class Hl7FieldIterator {
             }
             else {
                 String val = t.encode();
-                return val != null ? val : "";  //Fallback, safe guard
+                return val != null ? val : "";  //Fallback, safeguard
             }
         } catch (Exception e) {
             System.err.println("Error encoding field: " + t.getClass().getSimpleName() + " - " + e);
@@ -87,5 +85,4 @@ public class Hl7FieldIterator {
             }
         }
     }
-
 }

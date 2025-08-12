@@ -13,11 +13,8 @@ public class Hl7Parse {
             //converts \n or \r\n to \r
             String normalizedHL7 = message.replace("\r\n", "\r").replace("\n", "\r");
             //context.setValidationContext(ValidationContextFactory.defaultValidation());
-
             var parser = context.getPipeParser();
-
             parsedMessage = parser.parse(normalizedHL7);
-
     }
     //returns parsed message
     public Message getParsedMessage(){

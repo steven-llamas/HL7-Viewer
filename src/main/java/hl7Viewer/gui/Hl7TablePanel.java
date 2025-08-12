@@ -4,6 +4,7 @@ import ca.uhn.hl7v2.model.Message;
 import hl7Viewer.nonGui.parser.Hl7FieldIterator;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
@@ -25,7 +26,6 @@ public class Hl7TablePanel extends JPanel {
                 return false;
             }
         };
-
         parsedTable = new JTable(tableModel);
         parsedTable.setOpaque(false);
         parsedTable.setBackground(Utilities.TRANSPARENT_COLOR);
@@ -34,12 +34,14 @@ public class Hl7TablePanel extends JPanel {
         parsedTable.setFont(new Font("SansSerif", Font.PLAIN, 12));
         parsedTable.setRowHeight(22);
         parsedTable.setFillsViewportHeight(true);
-        parsedTable.getTableHeader().setReorderingAllowed(false);
-        parsedTable.getTableHeader().setResizingAllowed(false);
+        setupHeaderRenderer(parsedTable);
 
         var header = parsedTable.getTableHeader();
+        header.setReorderingAllowed(false);
+        header.setResizingAllowed(false);
+        header.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Utilities.TERCIARY_COLOR));
         Utilities.setPanelColors(header);
-        header.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Utilities.TERCIARY_COLOR));
+
 
         var scrollPane = getJScrollPane();
 
@@ -74,5 +76,25 @@ public class Hl7TablePanel extends JPanel {
                     "Parsing Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+    }
+    //fixes color bleed on table header by adding border on right side of first column
+    private void setupHeaderRenderer(JTable table) {
+        table.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus,
+                                                           int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                Utilities.setPanelColors(label);
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+
+                if (column < table.getColumnCount() - 1) {
+                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Utilities.TERCIARY_COLOR));
+                } else {
+                    label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+                }
+                return label;
+            }
+        });
     }
 }
