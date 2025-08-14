@@ -80,7 +80,7 @@ public class GuiBase extends JFrame {
     //text panel that is configured and includes key listener that sends text to be parsed
     private JPanel createMessagePanel() {
         var messagePanel = new JPanel(new BorderLayout());
-        Utilities.applyTitledBorder(messagePanel, "HL7 message to Parse");
+        Utilities.setTitledBorder(messagePanel, "HL7 message to Parse");
         messagePanel.setOpaque(false);
         //textbox and listener
         var inputField = new JTextArea();
@@ -95,18 +95,12 @@ public class GuiBase extends JFrame {
                 }
             }
         });
-        inputField.setLineWrap(true);
-        inputField.setWrapStyleWord(true);
-        inputField.setOpaque(false);
-        inputField.setBackground(Utilities.TRANSPARENT_COLOR);
-        inputField.setForeground(Utilities.TEXT_COLOR);
-        inputField.setCaretColor(Utilities.TEXT_COLOR);
-        inputField.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        Utilities.setTextBox(inputField, true,false);
         inputField.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Utilities.SECONDARY_COLOR, 2),
                 Utilities.addPadding(10, 10, 10, 10)
         ));
-        Utilities.setScrollPane(inputField, messagePanel);
+        Utilities.createScrollPane(inputField, messagePanel);
         return messagePanel;
     }
     //method that calls the HL7 panel to display parsed message

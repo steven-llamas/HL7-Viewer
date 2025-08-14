@@ -16,7 +16,7 @@ public class Utilities {
         return new EmptyBorder(top, left, bottom, right);
     }
     //preconfigured Title boarder, just need panel obj and Title name
-    public static void applyTitledBorder(JPanel panel, String titleText) {
+    public static void setTitledBorder(JComponent panel, String titleText) {
         TitledBorder border = BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(SECONDARY_COLOR, 1),
                 titleText,
@@ -45,7 +45,7 @@ public class Utilities {
         mainPanel.add(titleLabel, BorderLayout.NORTH);
     }
     //creates scroll pane and customizes it
-    public static void setScrollPane(JTextArea JTextArea, JPanel JPanel) {
+    public static void createScrollPane(JTextArea JTextArea, JPanel JPanel) {
         var scrollPane = new JScrollPane(JTextArea);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setOpaque(false);
@@ -56,5 +56,25 @@ public class Utilities {
 
         JPanel.add(scrollPane, BorderLayout.CENTER);
     }
-
+    //used to set color of buttons
+    public static void setButtonColors(JButton useJsonBtn) {
+        useJsonBtn.setBackground(SECONDARY_COLOR);
+        useJsonBtn.setForeground(TEXT_COLOR);
+    }
+    //sets TextBox colors
+    public static void setTextBox(JTextArea inputField, boolean isTransparentBackground, boolean isOpaque)  {
+        inputField.setLineWrap(true);
+        inputField.setWrapStyleWord(true);
+        if (isOpaque){
+            inputField.setOpaque(true);
+        }
+        else {inputField.setOpaque(false);}
+        if (isTransparentBackground){
+            inputField.setBackground(TRANSPARENT_COLOR);
+        }
+        else{ inputField.setBackground(PRIMARY_COLOR);}
+        inputField.setForeground(TEXT_COLOR);
+        inputField.setCaretColor(TEXT_COLOR);
+        inputField.setFont(new Font("Monospaced", Font.PLAIN, 12));
+    }
 }

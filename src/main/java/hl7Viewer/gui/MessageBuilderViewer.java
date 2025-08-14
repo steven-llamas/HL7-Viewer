@@ -24,20 +24,76 @@ public class MessageBuilderViewer {
         var customizationPanel = new JPanel();
         customizationPanel.setLayout(new BoxLayout(customizationPanel, BoxLayout.Y_AXIS));
         customizationPanel.setBorder(BorderFactory.createTitledBorder("Customization"));
-        Utilities.applyTitledBorder(customizationPanel, "Hl7 Message Picker");
+        Utilities.setTitledBorder(customizationPanel, "Hl7 Message Picker");
+
+        var useJsonBtn = getJsonBtn(customizationPanel);
+        customizationPanel.add(useJsonBtn);
+
         return customizationPanel;
+    }
+    //creates JSON button
+    private static JButton getJsonBtn(JComponent parent) {
+        var useJsonBtn = new JButton("JSON Editor");
+        Utilities.setButtonColors(useJsonBtn);
+        useJsonBtn.setVisible(true);
+        useJsonBtn.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        useJsonBtn.addActionListener(e -> jsonEditorDialog(parent));
+
+        return useJsonBtn;
+    }
+    //textbox for JSON editor
+    private static void jsonEditorDialog(JComponent parent) {
+        var dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), "JSON Editor",
+            Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setSize(700, 600);
+        dialog.setLocationRelativeTo(parent);
+
+        var jsonTextArea = new JTextArea(10,30);
+        jsonTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        Utilities.setTitledBorder(jsonTextArea, "JSON Message Customizer");
+        Utilities.setTextBox(jsonTextArea, false, true);
+
+        JScrollPane scrollPane = new JScrollPane(jsonTextArea);
+
+
+        var applyBtn = new JButton("Apply");
+        Utilities.setButtonColors(applyBtn);
+        var cancelBtn = new JButton("Cancel");
+        Utilities.setButtonColors(cancelBtn);
+
+        var buttonPanel = new JPanel();
+        Utilities.setPanelColors(buttonPanel);
+        buttonPanel.add(applyBtn);
+        buttonPanel.add(cancelBtn);
+
+        var dialogPanel = new JPanel(new BorderLayout());
+        dialogPanel.add(scrollPane, BorderLayout.CENTER);
+        dialogPanel.add(buttonPanel, BorderLayout.SOUTH);
+        dialog.setContentPane(dialogPanel);
+
+        applyBtn.addActionListener(ev -> {
+            String jsonMessage = jsonTextArea.getText();
+            // Aquí puedes agregar lógica para procesar el JSON,
+            // actualizar el mensaje HL7, etc.
+            System.out.println("JSON recibido:\n" + jsonMessage);
+            dialog.dispose();
+        });
+
+        cancelBtn.addActionListener(ev -> dialog.dispose());
+
+        dialog.setVisible(true);
     }
     //creates panel that will show generated message
     private JPanel generatedMessagePanel() {
         var messagePanel = new JPanel(new BorderLayout());
-        Utilities.applyTitledBorder(messagePanel, "Message Output");
+        Utilities.setTitledBorder(messagePanel, "Message Output");
 
         _outputArea = new JTextArea();
         Utilities.setPanelColors(_outputArea);
         _outputArea.setEditable(false);
         _outputArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
 
-       Utilities.setScrollPane(_outputArea, messagePanel);
+       Utilities.createScrollPane(_outputArea, messagePanel);
 
         return messagePanel;
     }
