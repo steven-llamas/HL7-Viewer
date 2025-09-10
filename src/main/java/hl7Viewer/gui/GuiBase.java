@@ -44,8 +44,10 @@ public class GuiBase extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                
-                if (clickedYes()) {
+                final int option = JOptionPane.showConfirmDialog(GuiBase.this,
+                        "Are you sure you want to exit",
+                        "Exit", JOptionPane.YES_NO_OPTION);
+                if (clickedYes(option)) {
                     GuiBase.this.dispose();
                 }
             }
@@ -83,10 +85,7 @@ public class GuiBase extends JFrame {
         contentPanel.repaint();
     }
     
-    private boolean clickedYes() {
-       final int option = JOptionPane.showConfirmDialog(GuiBase.this,
-                "Are you sure you want to exit",
-                "Exit", JOptionPane.YES_NO_OPTION);
+    private boolean clickedYes(int option) {
         return option == JOptionPane.YES_OPTION;
     }
 }

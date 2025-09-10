@@ -16,49 +16,79 @@ public class HL7ParseViewer {
     private HL7TableViewer hl7TableViewer;
 
     public JPanel createPanel() {
-        JPanel outerPanel = new JPanel(new BorderLayout());
-        outerPanel.setOpaque(false);
-        Utilities.createAndSetTitle(outerPanel, "HL7 Viewer");
+        var outerPanel = createAndSetHl7ViewerPanel();
+        var mainPanel = createAndSetInputAndOutputPanel();
 
-        JPanel mainPanel = new JPanel(new GridLayout(1, 2));
-        mainPanel.setOpaque(false);
-
-        hl7TableViewer = new HL7TableViewer();
-        JPanel messagePanel = createMessageInputPanel();
-
-        mainPanel.add(messagePanel);
-        mainPanel.add(hl7TableViewer);
         outerPanel.add(mainPanel, BorderLayout.CENTER);
 
         return outerPanel;
     }
 
+    private static JPanel createAndSetHl7ViewerPanel() {
+        var hl7ViewerPanel = new JPanel(new BorderLayout());
+        hl7ViewerPanel.setOpaque(false);
+        Utilities.createAndSetTitle(hl7ViewerPanel, "HL7 Viewer");
+
+        return hl7ViewerPanel;
+    }
+
+    private JPanel createAndSetInputAndOutputPanel() {
+        var inputAndOutputPanel = new JPanel(new GridLayout(1, 2));
+        inputAndOutputPanel.setOpaque(false);
+
+        hl7TableViewer = new HL7TableViewer();
+        var messagePanel = createMessageInputPanel();
+
+        inputAndOutputPanel.add(messagePanel);
+        inputAndOutputPanel.add(hl7TableViewer);
+
+        return inputAndOutputPanel;
+    }
+
     private JPanel createMessageInputPanel() {
-        JPanel messagePanel = new JPanel(new BorderLayout());
+        var messagePanel = new JPanel(new BorderLayout());
         messagePanel.setOpaque(false);
         Utilities.setTitledBorder(messagePanel, "HL7 message to Parse");
 
-        JTextArea inputField = new JTextArea();
-        Utilities.setTextBox(inputField, true, false);
-        inputField.setBorder(BorderFactory.createCompoundBorder(
+        var messageTextBox = createAndSetMessageTextBox();
+        addCtrlEnterKeyListener(messageTextBox);
+
+        Utilities.createAndSetScrollPane(messageTextBox, messagePanel);
+        
+        return messagePanel;
+    }
+
+    private JTextArea  createAndSetMessageTextBox() {
+        var messageTextBox = new JTextArea();
+        Utilities.setTextBox(messageTextBox, true, false);
+        messageTextBox.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Utilities.SECONDARY_COLOR, 2),
                 Utilities.addPadding(10, 10, 10, 10)
         ));
 
-        inputField.addKeyListener(new KeyAdapter() {
+        return messageTextBox;
+    }
+
+    private void addCtrlEnterKeyListener(JTextArea messageTextBox) {
+        messageTextBox.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER && e.isControlDown()) {
-                    String input = inputField.getText();
-                    parseAndDisplay(input);
-                    inputField.setText("");
+                if (pressedCtrlAndEnter(e)) {
+                    handleMessageAndClearTextbox(messageTextBox);
                     e.consume();
                 }
             }
         });
+    }
 
-        Utilities.createAndSetScrollPane(inputField, messagePanel);
-        return messagePanel;
+    private void handleMessageAndClearTextbox(JTextArea textBox) {
+        parseAndDisplay(textBox.getText());
+
+        textBox.setText("");
+    }
+
+    private static boolean pressedCtrlAndEnter(KeyEvent e) {
+        return e.isControlDown() && e.getKeyCode() == KeyEvent.VK_ENTER ;
     }
 
     private void parseAndDisplay(String input) {
@@ -71,20 +101,22 @@ public class HL7ParseViewer {
             hl7TableViewer.displayParsedHl7((ArrayList<String[]>) tableData);
 
         } catch (Exception ex) {
-            SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(null,
-                        "Failed to parse HL7 message:\n" + ex.getMessage(),
-                        "Parsing Error",
-                        JOptionPane.ERROR_MESSAGE);
-            });
+            showErrorMessage(ex.getMessage());
         }
+    }
+
+    private static void showErrorMessage(String exceptionMessage) {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(null,
+                    "Failed to parse HL7 message:\n" + exceptionMessage,
+                    "Parsing Error",
+                    JOptionPane.ERROR_MESSAGE);
+        });
     }
 }
 
 
-// -----------------------------
-// Package-private table viewer
-// -----------------------------
+
 class HL7TableViewer extends JPanel {
     private JTable hl7Tablecomponent;
     private DefaultTableModel hl7TableData;
