@@ -1,6 +1,8 @@
 package hl7Viewer.gui;
 
-import hl7Viewer.nonGui.parser.Hl7Parse;
+
+import hl7Viewer.nonGui.parser.HL7Node;
+import hl7Viewer.nonGui.parser.HL7Parser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,10 +10,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+
 
 public class GuiBase extends JFrame {
-    private Hl7Parse parse;
-    private Hl7TableViewer hl7TableViewer;
+    private HL7TableViewer hL7TableViewer;
     private JPanel contentPanel;//Constructor for the Swing window
     public GuiBase() {
         super("HL7 Viewer");
@@ -108,15 +113,19 @@ public class GuiBase extends JFrame {
     }
     //method that calls the HL7 panel to display parsed message
     private JPanel createParsedViewPanel() {
-        hl7TableViewer = new Hl7TableViewer();
-        return hl7TableViewer;
+        hL7TableViewer = new HL7TableViewer();
+        return hL7TableViewer;
     }
     //where the message is thrown to the parser in a try-catch
     private void viewProcessedMsg(String input) {
         try {
-            var parser = new Hl7Parse(input);
-           // Message hl7Message = parser.getParsedMessage();
-           // hl7TablePanel.updateFromInput(hl7Message);
+            var parser = new HL7Parser();
+            HL7Node root = parser.parse(input);
+
+            List<String[]> tableData = new ArrayList<>();
+            root.flatten(tableData);
+            hL7TableViewer.displayParsedHl7((ArrayList<String[]>) tableData);
+
         } catch (Exception ex) {
             SwingUtilities.invokeLater(() -> {
                 JOptionPane.showMessageDialog(null,

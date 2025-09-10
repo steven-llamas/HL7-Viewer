@@ -1,17 +1,16 @@
 package hl7Viewer.gui;
 
-import ca.uhn.hl7v2.model.Message;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.ArrayList;
 
-public class Hl7TableViewer extends JPanel {
+public class HL7TableViewer extends JPanel {
     private JTable parsedTable;
     private DefaultTableModel tableModel;
     //constructor that provide a few configurations
-    public Hl7TableViewer() {
+    public HL7TableViewer() {
         setLayout(new BorderLayout());
         setOpaque(false);
         initializeTable();
@@ -58,20 +57,24 @@ public class Hl7TableViewer extends JPanel {
         return scrollPane;
     }
     //updates the table when new message is to be parsed
-    public void displayParsedHl7(Message hl7Message) {
+    public void displayParsedHl7(ArrayList<String[]> tableData) {
         tableModel.setRowCount(0); // Clear previous data
 
-        try {
+            if (!DisPlayEachRow(tableData))
+                JOptionPane.showMessageDialog(this,
+                        "Failed to display HL7 fields:\n",
+                        "Parsing Error",
+                        JOptionPane.ERROR_MESSAGE);
 
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this,
-                    "Failed to display HL7 fields:\n" + e.getMessage(),
-                    "Parsing Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
     }
+    private boolean DisPlayEachRow(ArrayList<String[]> tableData) {
+
+        for (String[] row : tableData) {
+            tableModel.addRow(row);
+        }
+        return tableModel.getRowCount() != 0;
+    }
+
     //fixes color bleed on table header by adding border on right side of first column
     private void setupHeaderRenderer(JTable table) {
         table.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
