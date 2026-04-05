@@ -152,6 +152,11 @@
                                         <argument>msi</argument>
                                         <argument>--dest</argument>
                                         <argument>${project.build.directory}</argument>
+                                        <argument>--win-menu</argument>
+                                        <argument>--win-shortcut</argument>
+                                        <argument>--win-dir-chooser</argument> 
+                                        <argument>--install-dir</argument>
+                                        <argument>HL7 Viewer</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
