@@ -36,7 +36,7 @@ jobs:
         run: ls -l target
 
       - name: Upload macOS DMG artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: HL7-Viewer-mac
           path: target/*.dmg
@@ -70,7 +70,7 @@ jobs:
         run: dir target
 
       - name: Upload Windows EXE artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: HL7-Viewer-windows
           path: target\*.exe
