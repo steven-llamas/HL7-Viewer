@@ -22,7 +22,7 @@ public class HL7Message {
     }
 
 
-    public String void sanitizeEnterChar(String message) {
+    public static String sanitizeEnterChar(String message) {
         message.replaceAll("\\R","\r");
         return message;
     }

@@ -34,6 +34,7 @@ public class GuiBase extends JFrame {
         showHl7Viewer();
     }
 
+
     private void setAppOnCenterOfScreen() {
         setLocationRelativeTo(null);
     }
@@ -87,7 +88,7 @@ public class GuiBase extends JFrame {
 
     public void showHl7Viewer() {
         JPanel parserPanel =  (new HL7ParseViewer().createPanel());
-        var TablePanel = new HL7TableViewer();
+        final var TablePanel = new HL7TableViewer();
         panelRefresher(parserPanel);
 
     }

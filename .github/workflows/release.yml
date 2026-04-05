@@ -1,0 +1,76 @@
+name: Build HL7 Viewer
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-mac:
+    name: Build macOS DMG
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 24
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build shaded JAR and macOS DMG
+        run: mvn clean package -Pmac
+
+      - name: List target folder
+        run: ls -l target
+
+      - name: Upload macOS DMG artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: HL7-Viewer-mac
+          path: target/*.dmg
+
+  build-windows:
+    name: Build Windows EXE
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 24
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: C:\Users\runneradmin\.m2\repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build shaded JAR and Windows EXE
+        run: mvn clean package -Pwindows
+
+      - name: List target folder
+        run: dir target
+
+      - name: Upload Windows EXE artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: HL7-Viewer-windows
+          path: target\*.exe

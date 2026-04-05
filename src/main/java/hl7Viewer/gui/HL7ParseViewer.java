@@ -47,15 +47,25 @@ public class HL7ParseViewer {
 
 
     private JPanel createMessageInputPanel() {
-        var messagePanel = new JPanel(new BorderLayout());
+        final var messagePanel = new JPanel(new BorderLayout());
         messagePanel.setOpaque(false);
         Utilities.setTitledBorder(messagePanel, "HL7 message to Parse");
 
-        var messageTextBox = createAndSetMessageTextBox();
+        final var messageTextBox = createAndSetMessageTextBox();
         addCtrlEnterKeyListener(messageTextBox);
 
         Utilities.createAndSetScrollPane(messageTextBox, messagePanel);
-        
+
+        final var parseButton = createParseBtn(messageTextBox);
+        final var clearButton = createClearBtn(messageTextBox);
+
+        final var buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(clearButton);
+        buttonPanel.add(parseButton);
+
+        messagePanel.add(buttonPanel,BorderLayout.SOUTH);
+
         return messagePanel;
     }
 
@@ -74,13 +84,40 @@ public class HL7ParseViewer {
     }
 
 
-    private void addCtrlEnterKeyListener(JTextArea messageTextBox) {
+    private JButton createParseBtn(final JTextArea messageTextBox) {
+        final JButton parseButton = new JButton("Parse Message");
+
+        parseButton.setOpaque(true);
+        parseButton.setBorderPainted(false);
+        Utilities.setButtonColors(parseButton);
+        parseButton.addActionListener(e -> {
+            handleMessage(messageTextBox);
+        } );
+
+        return parseButton;
+    }
+
+
+    private JButton createClearBtn(final JTextArea messageTextBox) {
+        final JButton clearButton = new JButton("Clear Text");
+
+        clearButton.setOpaque(true);
+        clearButton.setBorderPainted(false);
+        Utilities.setButtonColors(clearButton);
+        clearButton.addActionListener(e -> {
+            messageTextBox.setText("");
+        });
+
+        return clearButton;
+    }
+
+
+    private void addCtrlEnterKeyListener(final JTextArea messageTextBox) {
         messageTextBox.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-
                 if (pressedCtrlAndEnter(e)) {
-                    handleMessageAndClearTextbox(messageTextBox);
+                    handleMessage(messageTextBox);
                     e.consume();
                 }
             }
@@ -88,7 +125,7 @@ public class HL7ParseViewer {
     }
 
 
-    private void handleMessageAndClearTextbox(JTextArea textBox) {
+    private void handleMessage(JTextArea textBox) {
         parseAndDisplay(textBox.getText());
         //textBox.setText("");
     }
