@@ -49,6 +49,7 @@ public class GuiBase extends JFrame {
             try {
                 Taskbar.getTaskbar().setIconImage(image.getImage());
             } catch (UnsupportedOperationException e) {
+                // do nothing
             }
         }
     }
