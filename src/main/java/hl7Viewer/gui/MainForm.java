@@ -12,7 +12,7 @@ public class MainForm extends JFrame {
 
     public MainForm() {
 
-        setTitle("Hl7 Viewer");
+        setTitle("HL7 Viewer");
         setSize(1000, 600);
         setAppOnCenterOfScreen();
         setImageIcon();
