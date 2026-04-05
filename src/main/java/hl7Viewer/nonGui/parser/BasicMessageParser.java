@@ -3,9 +3,9 @@ package hl7Viewer.nonGui.parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class BasicMessageParser implements IMessageParser {
+public class BasicMessageParser implements IHL7Parser {
     @Override
-    public HL7Message parse(String message) throws IllegalArgumentException {
+    public HL7Message parse(String message, HL7Message hl7Msg) throws IllegalArgumentException {
         java.util.Objects.requireNonNull(message, "Invalid Message: Message cannot be null.");
 
         message = message.trim();
@@ -18,7 +18,6 @@ public class BasicMessageParser implements IMessageParser {
 
         message = HL7Message.sanitizeEnterChar(message);
 
-        final var hl7Msg = new HL7Message();
         hl7Msg.setSegments(new ArrayList<>());
         final var segments = message.split("\n");
         char fieldSeparator         = '|';

@@ -147,7 +147,6 @@ public class HL7ParseViewer {
                 e ->  {
                     if (!clrTextIfEmpty(messageTextBox)) {
                         JOptionPane.showMessageDialog(hl7TableViewer, "Textbox is already empty.");
-                        return;
                     }
                 });
 
@@ -176,11 +175,11 @@ public class HL7ParseViewer {
 
     private void parseAndDisplay(String input) {
         try {
+            IHL7Parser parser = new BasicMessageParser();
+            var hl7Message = new HL7Message();
+            hl7Message = parser.parse(input, hl7Message);
 
-            IMessageParser parser = new BasicMessageParser();
-            var parsedMsg = new HL7Message();
-            parsedMsg = parser.parse(input);
-            hl7TableViewer.displayMessage(parsedMsg);
+            hl7TableViewer.displayMessage(hl7Message);
         } catch (Exception ex) {
             showErrorMessage(ex.getMessage());
         }
