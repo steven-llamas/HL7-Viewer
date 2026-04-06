@@ -3,7 +3,7 @@ package hl7Viewer.nonGui.parser;
 import java.util.List;
 
 public class HL7Component {
-    final List<String> subcomponentList;
+    private final List<String> subcomponentList;
 
 
     public HL7Component(List<String> subcomponentList) {
@@ -16,7 +16,7 @@ public class HL7Component {
     }
 
 
-    public boolean hasSubcomponent() {
+    public boolean hasSubcomponents() {
         return getSubcomponentList().size() > 1;
     }
 }

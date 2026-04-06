@@ -3,7 +3,7 @@ package hl7Viewer.nonGui.parser;
 import java.util.List;
 
 public class HL7Repetition {
-    final List<HL7Component> componentList;
+    private final List<HL7Component> componentList;
 
 
     public HL7Repetition(List<HL7Component> componentList) {
@@ -22,7 +22,7 @@ public class HL7Repetition {
     }
 
 
-    public boolean hasComponent() {
+    public boolean hasComponents() {
         return getComponentList().size() > 1;
     }
 }

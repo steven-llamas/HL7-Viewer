@@ -3,7 +3,7 @@ package hl7Viewer.nonGui.parser;
 import java.util.List;
 
 public class HL7Field {
-    final List<HL7Repetition> repetitionList;
+    private final List<HL7Repetition> repetitionList;
 
 
     public HL7Field(List<HL7Repetition> repetitionList) {
@@ -22,7 +22,7 @@ public class HL7Field {
     }
 
 
-    public boolean hasRepetition() {
+    public boolean hasRepetitions() {
         return getRepetitionList().size() > 1;
     }
 }

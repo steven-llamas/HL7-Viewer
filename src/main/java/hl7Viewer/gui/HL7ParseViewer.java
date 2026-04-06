@@ -33,13 +33,11 @@ public class HL7ParseViewer {
 
 
     private static void showErrorMessage(String exceptionMessage) {
-        SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Failed to parse HL7 message:\n" + exceptionMessage,
-                    "Parsing Error",
-                    JOptionPane.ERROR_MESSAGE);
-        });
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
+                null,
+                "Failed to parse HL7 message:\n" + exceptionMessage,
+                "Parsing Error",
+                JOptionPane.ERROR_MESSAGE));
     }
 
 
@@ -257,13 +255,13 @@ class HL7TableViewer extends JPanel {
 
         index.append("-").append(fieldIndex);
 
-        if(field.hasRepetition())
+        if(field.hasRepetitions())
             index.append(".").append(_repIndex + 1);
 
-        if(repetition.hasComponent())
+        if(repetition.hasComponents())
             index.append(".").append(_compIndex + 1);
 
-        if(comp.hasSubcomponent())
+        if(comp.hasSubcomponents())
             index.append(".").append(_subcomponentIndex + 1);
 
         return index;
@@ -366,7 +364,7 @@ class HL7TableViewer extends JPanel {
                         for (var m = 0; m < comp.getSubcomponentList().size(); m++ ) {
                             final String value          = comp.getSubcomponentList().get(m);
                             final String segHeader      = segment.getSegmentName();
-                            final StringBuilder index = calculateRowIndex(
+                            final StringBuilder index   = calculateRowIndex(
                                     segHeader,
                                     j, field,
                                     k, repetition,

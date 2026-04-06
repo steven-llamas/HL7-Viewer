@@ -3,8 +3,8 @@ package hl7Viewer.nonGui.parser;
 import java.util.List;
 
 public class HL7Segment {
-    final String segmentName;
-    final List<HL7Field> fieldList;
+    private final String segmentName;
+    private final List<HL7Field> fieldList;
 
 
     public HL7Segment(
