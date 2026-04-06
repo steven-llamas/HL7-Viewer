@@ -33,9 +33,12 @@ public class BasicMessageParser implements IHL7Parser {
 
             if (isMshSeg(hl7Seg)) {
                 final var encoding         = fields[1];
-                componentSeparator      = encoding.charAt(0);
-                repSeparator            = encoding.charAt(1);
-                subcomponentSeparator   = encoding.charAt(3);
+
+                if (!encoding.trim().isEmpty()) {
+                    componentSeparator      = encoding.charAt(0);
+                    repSeparator            = encoding.charAt(1);
+                    subcomponentSeparator   = encoding.charAt(3);
+                }
             }
 
             for (var field : fields) {
