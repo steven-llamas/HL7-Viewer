@@ -265,7 +265,7 @@ class HL7TableViewer extends JPanel {
         if(comp.hasSubcomponents())
             index.append(".").append(_subcomponentIndex + 1);
 
-    index.append("</html");
+    index.append("</html>");
         return index;
     }
 
