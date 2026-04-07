@@ -248,7 +248,8 @@ class HL7TableViewer extends JPanel {
             final int _compIndex,
             final HL7Component comp,
             final int _subcomponentIndex) {
-        final StringBuilder index   = new StringBuilder("<html><b>" + segHeader + "</b></html>");
+        final StringBuilder index   = new StringBuilder("<html><b>");
+        index.append(segHeader).append("</b>")
 
         final int fieldIndex = (segHeader.equals("MSH") && _fieldIndex != 0)
                 ? _fieldIndex + 1 : _fieldIndex;
@@ -264,6 +265,7 @@ class HL7TableViewer extends JPanel {
         if(comp.hasSubcomponents())
             index.append(".").append(_subcomponentIndex + 1);
 
+    index.append("</html");
         return index;
     }
 
