@@ -249,7 +249,7 @@ class HL7TableViewer extends JPanel {
             final HL7Component comp,
             final int _subcomponentIndex) {
         final StringBuilder index   = new StringBuilder("<html><b>");
-        index.append(segHeader).append("</b>")
+        index.append(segHeader).append("</b>");
 
         final int fieldIndex = (segHeader.equals("MSH") && _fieldIndex != 0)
                 ? _fieldIndex + 1 : _fieldIndex;
