@@ -2,11 +2,11 @@ package hl7Viewer.nonGui.parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class BasicMessageParser implements IHL7Parser {
     @Override
-    public HL7Message parse(String message, HL7Message hl7Msg) throws IllegalArgumentException {
-
+    public HL7Message parse(String message, HL7Message hl7Msg) throws IllegalArgumentException, NullPointerException {
         java.util.Objects.requireNonNull(message, "Message cannot be null.");
         java.util.Objects.requireNonNull(hl7Msg, "HL7 message Object cannot be null");
 
@@ -34,7 +34,8 @@ public class BasicMessageParser implements IHL7Parser {
             var fieldIndex = 0;
 
             if (isMshSeg(hl7Seg)) {
-                final var encoding = fields[1];
+                // TODO: add logic to check encoding field length (4)
+                final var encoding         = fields[1];
 
                 if (!encoding.trim().isEmpty()) {
                     componentSeparator      = encoding.charAt(0);
@@ -63,7 +64,8 @@ public class BasicMessageParser implements IHL7Parser {
                         final var hl7Comp = new HL7Component(new ArrayList<>());
 //                        final var subcomponents = component.split("\\" + subcomponentSeparator);
 //                        Collections.addAll(hl7Comp.getSubcomponentList(), subcomponents);
-                        Arrays.stream(component.split("\\" + subcomponentSeparator))
+                        Arrays.stream(
+                                    component.split(Pattern.quote(String.valueOf(subcomponentSeparator))))
                                 .map(String::toUpperCase)
                                 .map(String::trim)
                                 .forEach(hl7Comp.getSubcomponentList()::add);

@@ -8,6 +8,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 public class HL7ParseViewer {
     private HL7TableViewer hl7TableViewer;
@@ -180,6 +181,7 @@ public class HL7ParseViewer {
             hl7TableViewer.displayMessage(hl7Message);
         } catch (Exception ex) {
             showErrorMessage(ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }
