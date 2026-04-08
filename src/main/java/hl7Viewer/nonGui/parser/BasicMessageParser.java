@@ -7,7 +7,8 @@ import java.util.regex.Pattern;
 public class BasicMessageParser implements IHL7Parser {
     @Override
     public HL7Message parse(String message, HL7Message hl7Msg) throws IllegalArgumentException, NullPointerException {
-        java.util.Objects.requireNonNull(message, "Invalid Message: Message cannot be null.");
+        java.util.Objects.requireNonNull(message, "Message cannot be null.");
+        java.util.Objects.requireNonNull(hl7Msg, "HL7 message Object cannot be null");
 
         message = message.trim();
         if (message.isEmpty())
