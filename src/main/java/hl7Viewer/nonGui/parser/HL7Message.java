@@ -27,23 +27,25 @@ public class HL7Message {
         return message.replaceAll("\\R","\r");
     }
 
+
     public static Pair<Boolean,String> isValidHl7Message(final String message) {
         var isValid = false;
         String errorMsg = "Invalid Message: ";
 
         if (message.isEmpty())
-                return new Pair<>(isValid, errorMsg + "message cannot be empty");
+                errorMsg += "Message cannot be empty";
 
-        if(!message.substring(0,3).toUpperCase().contains("MSH"))
-                return new Pair<>(isValid, errorMsg +
-                        "Message doesn't contain MSH as first segment");
+        else if((message.length() < 4))
+            errorMsg += "Message length is too short";
 
-        if((message.length() < 4))
-                 return new Pair<>(isValid, errorMsg +
-                         "Message length is too short to parse");
+        else if (!message.substring(0,3).toUpperCase().contains("MSH"))
+            errorMsg += "Message doesn't contain MSH as first segment";
 
-        isValid = true;
-        errorMsg = "";
+        else {
+            isValid  = true;
+            errorMsg = "";
+        }
+
         return new Pair<>(isValid, errorMsg);
     }
 }

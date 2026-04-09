@@ -34,13 +34,13 @@ public class BasicMessageParser implements IHL7Parser {
             final var fields = segment.split(
                     Pattern.quote(String.valueOf(fieldSeparator)));
 
-            final var segHeader = fields[0].toUpperCase();
+            final var segHeader = fields[0].trim().toUpperCase();
             final var hl7Seg = new HL7Segment(segHeader, new ArrayList<>());
             var fieldIndex = 0;
 
             if (isMshSeg(hl7Seg)) {
-                final var encoding = (fields.length > 1) ? fields[1] : "";
 
+                final var encoding = (fields.length > 1) ? fields[1] : "";
                 if (validEncodingCharField(encoding)) {
                     componentSeparator      = encoding.charAt(0);
                     repSeparator            = encoding.charAt(1);
