@@ -219,12 +219,17 @@ class BasicMessageParserTest {
         void setUp() {
             parser = new BasicMessageParser();
             String msgWCustomEnc = """
-                    MSH|:*\\#|SENDING_APP|SENDING_FAC|REC_APP|REC_FAC|202310271030||ADT:A01|12345|P|2.5
+                    MSH!:*\\#|SENDING_APP|SENDING_FAC|REC_APP|REC_FAC|202310271030||ADT:A01|12345|P|2.5
                     EVN||202310271030
                     PID|1||PATID1234###Facility:MR||Doe:John:Character:Suffix||19800101|M|||123 Main St##Anytown:NY:12345||123-456-7987*126-555-0200|||S||P00123456
                     PV1|1|I|W4:402:A||||12345:Smith:Jane:Dr|||SUR||||ADM|A0|
                     """;
             parsedMsg = parser.parse(msgWCustomEnc, parsedMsg);
+        }
+
+        @Test
+        void msgShouldParseSegmentsWithCustomEnc() {
+            assertEquals(4, parsedMsg.getSegments().size());
         }
 
 
