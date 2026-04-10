@@ -79,14 +79,6 @@ public class HL7ParseViewer {
         Utilities.createAndSetScrollPane(messageTextBox, messagePanel);
 
 
-//        final var buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
-//        buttonPanel.setOpaque(false);
-//        buttonPanel.add(hl7TableViewer.createClrTableBtn());
-//        buttonPanel.add(createClrMsgBtn(messageTextBox));
-//        buttonPanel.add(createParseBtn(messageTextBox));
-//        buttonPanel.add(hl7TableViewer.createCpyTableBtn());
-//        messagePanel.add(buttonPanel,BorderLayout.SOUTH);
-
         final var btnPanel = new JPanel();
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.Y_AXIS));
         btnPanel.setOpaque(false);
@@ -167,7 +159,6 @@ public class HL7ParseViewer {
 
     private void handleMessage(JTextArea textBox) {
         parseAndDisplay(textBox.getText());
-        //textBox.setText("");
     }
 
 
@@ -178,8 +169,10 @@ public class HL7ParseViewer {
             hl7Message = parser.parse(input, hl7Message);
 
             hl7TableViewer.displayMessage(hl7Message);
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException | NullPointerException  ex ) {
             showErrorMessage(ex.getMessage());
+            // used for console bugging
+            ex.printStackTrace();
         }
     }
 }
@@ -371,7 +364,7 @@ class HL7TableViewer extends JPanel {
                                     j, field,
                                     k, repetition,
                                     l, comp, m);
-                            
+
                             if (!value.trim().isEmpty())
                                 hl7TableData.addRow(new Object[]{
                                     index, value

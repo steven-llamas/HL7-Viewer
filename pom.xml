@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>hl7</groupId>
     <artifactId>Hl7parser</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.2</version>
 
     <properties>
         <maven.compiler.source>24</maven.compiler.source>
@@ -13,7 +13,12 @@
     </properties>
 
     <dependencies>
-        <!-- add your dependencies here -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -154,7 +159,7 @@
                                         <argument>${project.build.directory}</argument>
                                         <argument>--win-menu</argument>
                                         <argument>--win-shortcut</argument>
-                                        <argument>--win-dir-chooser</argument> 
+                                        <argument>--win-dir-chooser</argument>
                                         <argument>--install-dir</argument>
                                         <argument>HL7 Viewer</argument>
                                     </arguments>

@@ -4,7 +4,7 @@ import java.util.List;
 
 public class HL7Message {
     private List<HL7Segment>  segments;
-
+    public static final String NORMAL_ENCODING = "|^~\\&";
 
     public void setSegments(List<HL7Segment> segments) {
         this.segments = segments;
@@ -23,7 +23,6 @@ public class HL7Message {
 
 
     public static String sanitizeEnterChar(String message) {
-        message.replaceAll("\\R","\r");
-        return message;
+        return message.replaceAll("\\R","\r");
     }
 }
