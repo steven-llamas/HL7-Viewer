@@ -6,7 +6,12 @@ import javax.swing.SwingUtilities;
 
 public class Main {
     public static void main(String[] args) {
-        runSwingGuiOnEdt();
+
+        try {
+            runSwingGuiOnEdt();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
 //   Runs the GUI in Event Dispatch Thread (EDT)
