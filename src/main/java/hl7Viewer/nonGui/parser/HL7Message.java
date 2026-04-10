@@ -1,6 +1,5 @@
 package hl7Viewer.nonGui.parser;
 
-import javafx.util.Pair;
 import java.util.List;
 
 public class HL7Message {
