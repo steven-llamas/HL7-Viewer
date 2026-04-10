@@ -1,11 +1,12 @@
 package hl7Viewer.nonGui.parser;
 
+import javafx.util.Pair;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import static hl7Viewer.nonGui.parser.HL7Message.NORMAL_ENCODING;
-import static hl7Viewer.nonGui.parser.HL7Message.isValidHl7Message;
 
 public class BasicMessageParser implements IHL7Parser {
     @Override
@@ -118,5 +119,26 @@ public class BasicMessageParser implements IHL7Parser {
         hl7Repetition.addComponent(component);
         hl7field.addRepetition(hl7Repetition);
         hl7Seg.addField(hl7field);
+    }
+
+    private static Pair<Boolean,String> isValidHl7Message(final String message) {
+        var isValid = false;
+        String errorMsg = "Invalid Message: ";
+
+        if (message.isEmpty())
+            errorMsg += "Message cannot be empty";
+
+        else if((message.length() < 4))
+            errorMsg += "Message length is too short";
+
+        else if (!message.substring(0,3).toUpperCase().contains("MSH"))
+            errorMsg += "Message doesn't contain MSH as first segment";
+
+        else {
+            isValid  = true;
+            errorMsg = "";
+        }
+
+        return new Pair<>(isValid, errorMsg);
     }
 }

@@ -171,6 +171,7 @@ public class HL7ParseViewer {
             hl7TableViewer.displayMessage(hl7Message);
         } catch (IllegalArgumentException | NullPointerException  ex ) {
             showErrorMessage(ex.getMessage());
+            // used for console bugging
             ex.printStackTrace();
         }
     }

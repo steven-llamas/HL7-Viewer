@@ -24,7 +24,7 @@ class BasicMessageParserTest {
     class ParserValidationTests {
         @Test
         @DisplayName("null message should throw Null Pointer Exception")
-        void parseNullStrMsgShouldRetNullPointerException() {
+        void parse_NullStrMsgShouldRetNullPointerException() {
             assertThrows(
                     NullPointerException.class,
                     () -> parser.parse(null, new HL7Message())
@@ -34,7 +34,7 @@ class BasicMessageParserTest {
 
         @Test
         @DisplayName("null HL7Message object should throw Null Pointer Exception")
-        void parseNullHL7MsgShouldRetNullPointerException() {
+        void parse_NullHL7MsgShouldRetNullPointerException() {
             assertThrows(
                     NullPointerException.class,
                     () -> parser.parse("MSH|||", null)
@@ -44,7 +44,7 @@ class BasicMessageParserTest {
 
         @Test
         @DisplayName("Empty message should throw Illegal Argument Exception")
-        void parseEmptyStrMsgShouldThrowIllegalArgumentException() {
+        void parse_EmptyStrMsgShouldThrowIllegalArgumentException() {
             assertThrows(
                     IllegalArgumentException.class,
                     () -> parser.parse("", new HL7Message())
@@ -54,7 +54,7 @@ class BasicMessageParserTest {
 
         @Test
         @DisplayName("Message with only whitespace should throw Illegal Argument Exception")
-        void parseStrMsgWithWhitespaceShouldThrowIllegalArgumentException() {
+        void parse_StrMsgWithWhitespaceShouldThrowIllegalArgumentException() {
             assertThrows(
                     IllegalArgumentException.class,
                     () -> parser.parse("      ", new HL7Message())
@@ -64,7 +64,7 @@ class BasicMessageParserTest {
 
         @Test
         @DisplayName("message not containing MSH within in the first 3 characters should throw Illegal Argument Exception")
-        void parseMsgNotHavingMSHinFirstFourShouldThrowIllegalArgumentException() {
+        void parse_MsgNotHavingMSHinFirstFourShouldThrowIllegalArgumentException() {
             assertThrows(
                     IllegalArgumentException.class,
                     () -> parser.parse("Test Message", new HL7Message())
@@ -74,7 +74,7 @@ class BasicMessageParserTest {
 
         @Test
         @DisplayName("empty MSH encoding field should NOT throw Out of bounds exception")
-        void parseEmptyMshEncodingCharShouldNotThrowException() {
+        void parse_EmptyMshEncodingCharShouldNotThrowException() {
             assertDoesNotThrow(
                     () -> parser.parse(
                             "MSH||test|test|test|", new HL7Message())
