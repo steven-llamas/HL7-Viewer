@@ -1,4 +1,4 @@
-package hl7Viewer.nonGui.parser;
+package hl7Viewer.nonGui.hl7Parser;
 
 public interface IHL7Parser {
 

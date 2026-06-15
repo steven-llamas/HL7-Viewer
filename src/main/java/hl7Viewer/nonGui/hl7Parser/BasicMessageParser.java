@@ -1,11 +1,11 @@
-package hl7Viewer.nonGui.parser;
+package hl7Viewer.nonGui.hl7Parser;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import static hl7Viewer.nonGui.parser.HL7Message.NORMAL_ENCODING;
+import static hl7Viewer.nonGui.hl7Parser.HL7Message.NORMAL_ENCODING;
 
 public class BasicMessageParser implements IHL7Parser {
     @Override
@@ -14,7 +14,7 @@ public class BasicMessageParser implements IHL7Parser {
         java.util.Objects.requireNonNull(hl7Msg, "HL7 message Object cannot be null");
 
         message = message.trim();
-        isValidHl7Message(message);
+        throwIllegalArgumentExcepIfInvalid(message);
         message = HL7Message.sanitizeEnterChar(message);
 
         hl7Msg.setSegments(new ArrayList<>());
@@ -114,7 +114,7 @@ public class BasicMessageParser implements IHL7Parser {
         hl7Seg.addField(hl7field);
     }
 
-    private static void isValidHl7Message(final String message)  {
+    private static void throwIllegalArgumentExcepIfInvalid(final String message)  {
         var isValid = false;
         String errorMsg = "Invalid Message: ";
 

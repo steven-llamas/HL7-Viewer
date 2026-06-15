@@ -1,4 +1,4 @@
-package hl7Viewer.nonGui.parser;
+package hl7Viewer.nonGui.hl7Parser;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
