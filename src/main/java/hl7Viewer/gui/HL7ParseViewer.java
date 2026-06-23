@@ -1,7 +1,6 @@
 package hl7Viewer.gui;
 
-import hl7Viewer.nonGui.parser.*;
-
+import hl7Viewer.nonGui.hl7Parser.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -41,7 +40,7 @@ public class HL7ParseViewer {
     }
 
 
-    private static boolean clrTextIfEmpty(JTextArea messageTextBox) {
+    private static boolean clrTextIfNotEmpty(JTextArea messageTextBox) {
         if (!messageTextBox.getText().trim().isEmpty()) {
             messageTextBox.setText("");
             return true;
@@ -135,7 +134,7 @@ public class HL7ParseViewer {
         Utilities.setButtonColors(clearButton);
         clearButton.addActionListener(
                 e ->  {
-                    if (!clrTextIfEmpty(messageTextBox)) {
+                    if (!clrTextIfNotEmpty(messageTextBox)) {
                         JOptionPane.showMessageDialog(hl7TableViewer, "Textbox is already empty.");
                     }
                 });
@@ -232,35 +231,6 @@ class HL7TableViewer extends JPanel {
     }
 
 
-    private static StringBuilder calculateRowIndex(
-            final String segHeader,
-            final int _fieldIndex,
-            final HL7Field field,
-            final int _repIndex,
-            final HL7Repetition repetition,
-            final int _compIndex,
-            final HL7Component comp,
-            final int _subcomponentIndex) {
-        final StringBuilder index   = new StringBuilder("<html><b>");
-        index.append(segHeader).append("</b>");
-
-        final int fieldIndex = (segHeader.equals("MSH") && _fieldIndex != 0)
-                ? _fieldIndex + 1 : _fieldIndex;
-
-        index.append("-").append(fieldIndex);
-
-        if(field.hasRepetitions())
-            index.append(".").append(_repIndex + 1);
-
-        if(repetition.hasComponents())
-            index.append(".").append(_compIndex + 1);
-
-        if(comp.hasSubcomponents())
-            index.append(".").append(_subcomponentIndex + 1);
-
-    index.append("</html>");
-        return index;
-    }
 
 
     private void copyTableToClipboard() {
@@ -344,37 +314,16 @@ class HL7TableViewer extends JPanel {
 
 
     private boolean displayEachRow(final HL7Message hl7Message) {
-        for (var i = 0; i < hl7Message.getSegments().size(); i++ ) {
-            final var segment = hl7Message.getSegments().get(i);
+        for (final var row : hl7Message.flatten()) {
 
-            for (var j = 0; j < segment.getFieldList().size(); j++) {
-                final var field = segment.getFieldList().get(j);
-
-                for (var k = 0; k < field.getRepetitionList().size(); k++ ) {
-                    final var repetition = field.getRepetitionList().get(k);
-
-                    for (var l = 0; l < repetition.getComponentList().size(); l++) {
-                        final var comp = repetition.getComponentList().get(l);
-
-                        for (var m = 0; m < comp.getSubcomponentList().size(); m++ ) {
-                            final String value          = comp.getSubcomponentList().get(m);
-                            final String segHeader      = segment.getSegmentName();
-                            final StringBuilder index   = calculateRowIndex(
-                                    segHeader,
-                                    j, field,
-                                    k, repetition,
-                                    l, comp, m);
-
-                            if (!value.trim().isEmpty())
-                                hl7TableData.addRow(new Object[]{
-                                    index, value
-                                } );
-                        }
-                    }
-                }
-            }
+            final String plainIndex = row.getKey();
+            final int dash = plainIndex.indexOf('-');
+            final String htmlIndex = "<html><b>" +
+                    plainIndex.substring(0, dash) + "</b>" +
+                    plainIndex.substring(dash) + "</html>";
+            
+            hl7TableData.addRow(new Object[]{ htmlIndex, row.getValue() });
         }
-
         return hl7TableData.getRowCount() != 0;
     }
 
