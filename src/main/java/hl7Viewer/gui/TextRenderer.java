@@ -22,7 +22,7 @@ public class TextRenderer extends JTextArea implements javax.swing.table.TableCe
 
         setText((value == null) ? "" : value.toString());
 
-        if(isSelected) {
+        if (isSelected) {
             setBackground(table.getSelectionBackground());
             setForeground(table.getSelectionForeground());
         } else {

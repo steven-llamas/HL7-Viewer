@@ -84,13 +84,16 @@ public class HL7ParseViewer {
 
         final var topBtns = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
         topBtns.setOpaque(false);
-        topBtns.add(createParseBtn(messageTextBox));
+        topBtns.add(new Button("Parse HL7", () -> handleMessage(messageTextBox)));
         topBtns.add(hl7TableViewer.createCpyTableBtn());
         btnPanel.add(topBtns);
 
         final var botBtns = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
         botBtns.setOpaque(false);
-        botBtns.add(createClrMsgBtn(messageTextBox));
+        botBtns.add(new Button("Clear Text", () -> {
+            if (!clrTextIfNotEmpty(messageTextBox))
+                JOptionPane.showMessageDialog(hl7TableViewer, "Textbox is already empty.");
+        }));
         botBtns.add(hl7TableViewer.createClrTableBtn());
         btnPanel.add(botBtns);
 
@@ -203,11 +206,8 @@ class HL7TableViewer extends JPanel {
     public JButton createClrTableBtn() {
         final var clearBtn = new JButton("Clear Table");
 
-        clearBtn.setOpaque(true);
-        clearBtn.setBorderPainted(false);
-        Utilities.setButtonColors(clearBtn);
-
-        clearBtn.addActionListener(e ->  {
+    public Button createClrTableBtn() {
+        return new Button("Clear Table", () -> {
             if (jTable.getRowCount() == 0) {
                 JOptionPane.showMessageDialog(this, "Table is already Empty.");
                 return;
@@ -219,15 +219,8 @@ class HL7TableViewer extends JPanel {
     }
 
 
-    public JButton createCpyTableBtn() {
-        final var cpyBtn = new JButton("Copy Table");
-
-        cpyBtn.setOpaque(true);
-        cpyBtn.setBorderPainted(false);
-        Utilities.setButtonColors(cpyBtn);
-
-        cpyBtn.addActionListener( e -> copyTableToClipboard());
-        return cpyBtn;
+    public Button createCpyTableBtn() {
+        return new Button("Copy Table", this::copyTableToClipboard);
     }
 
 
