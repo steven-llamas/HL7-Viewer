@@ -17,7 +17,7 @@ public class BasicMessageParser implements IHL7Parser {
         throwIllegalArgumentExcepIfInvalid(message);
         message = HL7Message.sanitizeEnterChar(message);
 
-        hl7Msg.setSegments(new ArrayList<>());
+        hl7Msg.setItems(new ArrayList<>());
         final var segments = message.split("\r");
         final char fieldSeparator   = segments[0].charAt(3);
         char componentSeparator     = NORMAL_ENCODING.charAt(1);
@@ -75,7 +75,7 @@ public class BasicMessageParser implements IHL7Parser {
                 hl7Seg.add(hl7field);
                 fieldIndex++;
             }
-            hl7Msg.addSegment(hl7Seg);
+            hl7Msg.add(hl7Seg);
         }
         return hl7Msg;
     }

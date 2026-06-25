@@ -5,10 +5,20 @@ import java.util.List;
 public abstract class HL7Base<T> {
     protected List<T> items;
 
+
     protected HL7Base(List<T> items) {
         this.items = items;
     }
 
+
+    protected HL7Base() {
+
+    }
+
+
+    public void setItems(List<T> items) {
+        this.items = items;
+    }
 
     public void add(T item) {
         if (item != null)

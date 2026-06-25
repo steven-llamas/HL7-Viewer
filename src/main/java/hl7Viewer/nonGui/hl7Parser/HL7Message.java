@@ -4,30 +4,13 @@ import hl7Viewer.utils.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HL7Message {
-    private List<HL7Segment>  segments;
+public class HL7Message extends HL7Base<HL7Segment> {
     public static final String NORMAL_ENCODING = "|^~\\&";
-
-    public void setSegments(List<HL7Segment> segments) {
-        this.segments = segments;
-    }
-
-
-    public void addSegment(HL7Segment segment) {
-        if (segment != null)
-            segments.addLast(segment);
-    }
-
-
-    public List<HL7Segment> getSegments() {
-        return segments;
-    }
-
 
     public List<Pair<String, String>> flatten() {
         final List<Pair<String, String>> rows = new ArrayList<>();
 
-        for (final var segment : segments) {
+        for (final var segment : items) {
             final String segName = segment.getSegmentName();
 
             for (var j = 0; j < segment.getItems().size(); ++j) {
@@ -71,6 +54,6 @@ public class HL7Message {
 
 
     public static String sanitizeEnterChar(String message) {
-        return message.replaceAll("\\R","\r");
+        return message.replaceAll("\\R", "\r");
     }
 }
