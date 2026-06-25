@@ -2,27 +2,10 @@ package hl7Viewer.nonGui.hl7Parser;
 
 import java.util.List;
 
-public class HL7Field {
-    private final List<HL7Repetition> repetitionList;
-
+public class HL7Field extends HL7Base<HL7Repetition> {
 
     public HL7Field(List<HL7Repetition> repetitionList) {
-        this.repetitionList = repetitionList;
+        super(repetitionList);
     }
 
-
-    public void addRepetition(HL7Repetition repetition) {
-        if (repetition != null)
-            repetitionList.addLast(repetition);
-    }
-
-
-    public List<HL7Repetition> getRepetitionList() {
-        return repetitionList;
-    }
-
-
-    public boolean hasRepetitions() {
-        return getRepetitionList().size() > 1;
-    }
 }

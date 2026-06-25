@@ -66,13 +66,13 @@ public class BasicMessageParser implements IHL7Parser {
                                     component.split(Pattern.quote(String.valueOf(subcomponentSeparator))))
                                 .map(String::toUpperCase)
                                 .map(String::trim)
-                                .forEach(hl7Comp.getSubcomponentList()::add);
+                                .forEach(hl7Comp.getItems()::add);
 
-                        hl7Repetition.addComponent(hl7Comp);
+                        hl7Repetition.add(hl7Comp);
                     }
-                    hl7field.addRepetition(hl7Repetition);
+                    hl7field.add(hl7Repetition);
                 }
-                hl7Seg.addField(hl7field);
+                hl7Seg.add(hl7field);
                 fieldIndex++;
             }
             hl7Msg.addSegment(hl7Seg);
@@ -107,11 +107,11 @@ public class BasicMessageParser implements IHL7Parser {
         final var hl7Repetition = new HL7Repetition(new ArrayList<>());
         final var component = new HL7Component(new ArrayList<>());
 
-        component.getSubcomponentList().add(field);
+        component.getItems().add(field);
 
-        hl7Repetition.addComponent(component);
-        hl7field.addRepetition(hl7Repetition);
-        hl7Seg.addField(hl7field);
+        hl7Repetition.add(component);
+        hl7field.add(hl7Repetition);
+        hl7Seg.add(hl7field);
     }
 
     private static void throwIllegalArgumentExcepIfInvalid(final String message)  {

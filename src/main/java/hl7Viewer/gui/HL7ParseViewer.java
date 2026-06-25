@@ -224,8 +224,6 @@ class HL7TableViewer extends JPanel {
     }
 
 
-
-
     private void copyTableToClipboard() {
         if (jTable.getRowCount() == 0) {
             JOptionPane.showMessageDialog(

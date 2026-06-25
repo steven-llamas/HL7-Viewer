@@ -2,32 +2,15 @@ package hl7Viewer.nonGui.hl7Parser;
 
 import java.util.List;
 
-public class HL7Segment {
+public class HL7Segment extends HL7Base<HL7Field> {
     private final String segmentName;
-    private final List<HL7Field> fieldList;
 
-
-    public HL7Segment(
-            String segmentName,
-            List<HL7Field> fieldList) {
+    public HL7Segment(String segmentName, List<HL7Field> list) {
+        super(list);
         this.segmentName = segmentName;
-        this.fieldList = fieldList;
     }
-
-
-    public void addField(HL7Field field) {
-        if (field != null)
-            fieldList.addLast(field);
-    }
-
 
     public String getSegmentName() {
         return segmentName;
     }
-
-
-    public List<HL7Field> getFieldList() {
-        return fieldList;
-    }
-
 }

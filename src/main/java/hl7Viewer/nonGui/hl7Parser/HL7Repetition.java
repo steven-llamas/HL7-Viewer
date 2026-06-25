@@ -2,27 +2,8 @@ package hl7Viewer.nonGui.hl7Parser;
 
 import java.util.List;
 
-public class HL7Repetition {
-    private final List<HL7Component> componentList;
-
-
-    public HL7Repetition(List<HL7Component> componentList) {
-        this.componentList = componentList;
-    }
-
-
-    public void addComponent(HL7Component component) {
-        if (component != null)
-            componentList.addLast(component);
-    }
-
-
-    public List<HL7Component> getComponentList() {
-        return componentList;
-    }
-
-
-    public boolean hasComponents() {
-        return getComponentList().size() > 1;
+public class HL7Repetition extends HL7Base<HL7Component> {
+    public HL7Repetition(List<HL7Component> list) {
+        super(list);
     }
 }

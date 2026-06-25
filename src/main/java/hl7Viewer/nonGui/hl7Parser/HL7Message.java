@@ -30,19 +30,22 @@ public class HL7Message {
         for (final var segment : segments) {
             final String segName = segment.getSegmentName();
 
-            for (var j = 0; j < segment.getFieldList().size(); ++j) {
-                final var field = segment.getFieldList().get(j);
+            for (var j = 0; j < segment.getItems().size(); ++j) {
+                final var field = segment.getItems().get(j);
 
-                final int fieldIndex = (segName.equals("MSH") && j != 0) ? j + 1 : j;
+                final int fieldIndex =
+                        (segName.equals("MSH") && j != 0)
+                                ? j + 1
+                                : j;
 
-                for (var k = 0; k < field.getRepetitionList().size(); ++k) {
-                    final var repetition = field.getRepetitionList().get(k);
+                for (var k = 0; k < field.getItems().size(); ++k) {
+                    final var repetition = field.getItems().get(k);
 
-                    for (var l = 0; l < repetition.getComponentList().size(); ++l) {
-                        final var comp = repetition.getComponentList().get(l);
+                    for (var l = 0; l < repetition.getItems().size(); ++l) {
+                        final var comp = repetition.getItems().get(l);
 
-                        for (var m = 0; m < comp.getSubcomponentList().size(); ++m) {
-                            final String value = comp.getSubcomponentList().get(m);
+                        for (var m = 0; m < comp.getItems().size(); ++m) {
+                            final String value = comp.getItems().get(m);
 
                             if (value.trim().isEmpty())
                                 continue;
@@ -50,11 +53,11 @@ public class HL7Message {
                             final StringBuilder index = new StringBuilder(segName);
                             index.append("-").append(fieldIndex);
 
-                            if (field.hasRepetitions())
+                            if (field.hasItems())
                                 index.append(".").append(k + 1);
-                            if (repetition.hasComponents())
+                            if (repetition.hasItems())
                                 index.append(".").append(l + 1);
-                            if (comp.hasSubcomponents())
+                            if (comp.hasItems())
                                 index.append(".").append(m + 1);
 
                             rows.add(new Pair<>(index.toString(), value));
