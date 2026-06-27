@@ -23,7 +23,7 @@ public class MenuBar extends JMenuBar {
 
     private JMenu getOrCreateMenu(String menuName) {
         for (int i = 0; i < getMenuCount(); i++) {
-            JMenu menu = getMenu(i);
+            final JMenu menu = getMenu(i);
             if (menuName.equals(menu.getText()))
                 return menu;
         }
@@ -39,7 +39,7 @@ public class MenuBar extends JMenuBar {
 
     private boolean menuContainsItem(JMenu menu, String itemName) {
         for (int i = 0; i < menu.getItemCount(); i++) {
-            JMenuItem item = menu.getItem(i);
+            final JMenuItem item = menu.getItem(i);
             if (itemName.equals(item.getText()))
                 return true;
         }

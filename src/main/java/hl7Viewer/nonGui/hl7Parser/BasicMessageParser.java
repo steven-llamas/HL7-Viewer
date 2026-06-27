@@ -1,11 +1,11 @@
-package hl7Viewer.nonGui.parser;
+package hl7Viewer.nonGui.hl7Parser;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import static hl7Viewer.nonGui.parser.HL7Message.NORMAL_ENCODING;
+import static hl7Viewer.nonGui.hl7Parser.HL7Message.NORMAL_ENCODING;
 
 public class BasicMessageParser implements IHL7Parser {
     @Override
@@ -14,10 +14,10 @@ public class BasicMessageParser implements IHL7Parser {
         java.util.Objects.requireNonNull(hl7Msg, "HL7 message Object cannot be null");
 
         message = message.trim();
-        isValidHl7Message(message);
+        throwIllegalArgumentExcepIfInvalid(message);
         message = HL7Message.sanitizeEnterChar(message);
 
-        hl7Msg.setSegments(new ArrayList<>());
+        hl7Msg.setItems(new ArrayList<>());
         final var segments = message.split("\r");
         final char fieldSeparator   = segments[0].charAt(3);
         char componentSeparator     = NORMAL_ENCODING.charAt(1);
@@ -66,16 +66,16 @@ public class BasicMessageParser implements IHL7Parser {
                                     component.split(Pattern.quote(String.valueOf(subcomponentSeparator))))
                                 .map(String::toUpperCase)
                                 .map(String::trim)
-                                .forEach(hl7Comp.getSubcomponentList()::add);
+                                .forEach(hl7Comp.getItems()::add);
 
-                        hl7Repetition.addComponent(hl7Comp);
+                        hl7Repetition.add(hl7Comp);
                     }
-                    hl7field.addRepetition(hl7Repetition);
+                    hl7field.add(hl7Repetition);
                 }
-                hl7Seg.addField(hl7field);
+                hl7Seg.add(hl7field);
                 fieldIndex++;
             }
-            hl7Msg.addSegment(hl7Seg);
+            hl7Msg.add(hl7Seg);
         }
         return hl7Msg;
     }
@@ -107,14 +107,14 @@ public class BasicMessageParser implements IHL7Parser {
         final var hl7Repetition = new HL7Repetition(new ArrayList<>());
         final var component = new HL7Component(new ArrayList<>());
 
-        component.getSubcomponentList().add(field);
+        component.getItems().add(field);
 
-        hl7Repetition.addComponent(component);
-        hl7field.addRepetition(hl7Repetition);
-        hl7Seg.addField(hl7field);
+        hl7Repetition.add(component);
+        hl7field.add(hl7Repetition);
+        hl7Seg.add(hl7field);
     }
 
-    private static void isValidHl7Message(final String message)  {
+    private static void throwIllegalArgumentExcepIfInvalid(final String message)  {
         var isValid = false;
         String errorMsg = "Invalid Message: ";
 
