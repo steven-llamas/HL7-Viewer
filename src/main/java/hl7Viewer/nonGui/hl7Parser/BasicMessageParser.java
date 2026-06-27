@@ -1,6 +1,8 @@
 package hl7Viewer.nonGui.hl7Parser;
 
 
+import hl7Viewer.utils.Pair;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -14,7 +16,12 @@ public class BasicMessageParser implements IHL7Parser {
         java.util.Objects.requireNonNull(hl7Msg, "HL7 message Object cannot be null");
 
         message = message.trim();
-        throwIllegalArgumentExcepIfInvalid(message);
+
+
+        Pair<Boolean, String> validPair = HL7Validator.validateStructure(message);
+        if (!validPair.first())
+            throw new IllegalArgumentException(validPair.second());
+
         message = HL7Message.sanitizeEnterChar(message);
 
         hl7Msg.setItems(new ArrayList<>());
@@ -112,27 +119,5 @@ public class BasicMessageParser implements IHL7Parser {
         hl7Repetition.add(component);
         hl7field.add(hl7Repetition);
         hl7Seg.add(hl7field);
-    }
-
-    private static void throwIllegalArgumentExcepIfInvalid(final String message)  {
-        var isValid = false;
-        String errorMsg = "Invalid Message: ";
-
-        if (message.isEmpty())
-            errorMsg += "Message cannot be empty";
-
-        else if((message.length() < 4))
-            errorMsg += "Message length is too short";
-
-        else if (!message.substring(0,3).toUpperCase().contains("MSH"))
-            errorMsg += "Message doesn't contain MSH as first segment";
-
-        else {
-            isValid  = true;
-            errorMsg = "";
-        }
-
-        if (!isValid)
-            throw new IllegalArgumentException(errorMsg);
     }
 }
