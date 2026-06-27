@@ -113,7 +113,7 @@ class HL7MessageTest {
         @Test
         @DisplayName("should not contain any pairs with empty or whitespace values")
         void flatten_shouldNotContainEmptyValues() {
-            assertTrue(rows.stream().noneMatch(r -> r.getValue().trim().isEmpty()));
+            assertTrue(rows.stream().noneMatch(r -> r.second().trim().isEmpty()));
         }
 
 
@@ -121,14 +121,14 @@ class HL7MessageTest {
         @DisplayName("should produce index PID-3 with value PI12345")
         void flatten_pidThree_shouldHaveCorrectIndexAndValue() {
             assertTrue(rows.stream().anyMatch(
-                    r -> r.getKey().equals("PID-3") && r.getValue().equals("PI12345")));
+                    r -> r.first().equals("PID-3") && r.second().equals("PI12345")));
         }
 
 
         @Test
         @DisplayName("MSH encoding chars field should have index MSH-2 due to field offset")
         void flatten_mshEncodingField_shouldApplyFieldOffset() {
-            assertTrue(rows.stream().anyMatch(r -> r.getKey().startsWith("MSH-2")));
+            assertTrue(rows.stream().anyMatch(r -> r.first().startsWith("MSH-2")));
         }
 
 
@@ -136,9 +136,9 @@ class HL7MessageTest {
         @DisplayName("should include repetition index for PID-13 when field has multiple repetitions")
         void flatten_pidThirteenRepetitions_shouldIndexEachRepetition() {
             assertTrue(rows.stream().anyMatch(
-                    r -> r.getKey().equals("PID-13.1") && r.getValue().equals("(555)555-1212")));
+                    r -> r.first().equals("PID-13.1") && r.second().equals("(555)555-1212")));
             assertTrue(rows.stream().anyMatch(
-                    r -> r.getKey().equals("PID-13.2") && r.getValue().equals("(555)555-1313")));
+                    r -> r.first().equals("PID-13.2") && r.second().equals("(555)555-1313")));
         }
 
 
@@ -146,9 +146,9 @@ class HL7MessageTest {
         @DisplayName("should include component index for MSH-9 when field has multiple components")
         void flatten_mshNineComponents_shouldIndexEachComponent() {
             assertTrue(rows.stream().anyMatch(
-                    r -> r.getKey().equals("MSH-9.1") && r.getValue().equals("ADT")));
+                    r -> r.first().equals("MSH-9.1") && r.second().equals("ADT")));
             assertTrue(rows.stream().anyMatch(
-                    r -> r.getKey().equals("MSH-9.2") && r.getValue().equals("A04")));
+                    r -> r.first().equals("MSH-9.2") && r.second().equals("A04")));
         }
 
 
@@ -156,20 +156,20 @@ class HL7MessageTest {
         @DisplayName("should include subcomponent index for PID-11 address subcomponents")
         void flatten_pidElevenAddress_shouldIndexEachSubcomponent() {
             assertTrue(rows.stream().anyMatch(
-                    r -> r.getKey().equals("PID-11.1.1") && r.getValue().equals("123 MAIN ST")));
+                    r -> r.first().equals("PID-11.1.1") && r.second().equals("123 MAIN ST")));
             assertTrue(rows.stream().anyMatch(
-                    r -> r.getKey().equals("PID-11.1.2") && r.getValue().equals("APT 4B")));
+                    r -> r.first().equals("PID-11.1.2") && r.second().equals("APT 4B")));
             assertTrue(rows.stream().anyMatch(
-                    r -> r.getKey().equals("PID-11.1.3") && r.getValue().equals("METROPOLIS")));
+                    r -> r.first().equals("PID-11.1.3") && r.second().equals("METROPOLIS")));
         }
 
 
         @Test
         @DisplayName("should produce rows from all segments")
         void flatten_allSegments_shouldProduceRowsFromEach() {
-            assertTrue(rows.stream().anyMatch(r -> r.getKey().startsWith("MSH")));
-            assertTrue(rows.stream().anyMatch(r -> r.getKey().startsWith("PID")));
-            assertTrue(rows.stream().anyMatch(r -> r.getKey().startsWith("PV1")));
+            assertTrue(rows.stream().anyMatch(r -> r.first().startsWith("MSH")));
+            assertTrue(rows.stream().anyMatch(r -> r.first().startsWith("PID")));
+            assertTrue(rows.stream().anyMatch(r -> r.first().startsWith("PV1")));
         }
     }
 }

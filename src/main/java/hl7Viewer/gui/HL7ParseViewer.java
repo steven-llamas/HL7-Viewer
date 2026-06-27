@@ -260,7 +260,7 @@ class HL7TableViewer extends JPanel {
 
     private boolean displayEachRow(final HL7Message hl7Message) {
         for (final var row : hl7Message.flatten()) {
-            final String plainIndex = row.getKey();
+            final String plainIndex = row.first();
             final int dash = plainIndex.indexOf('-');
             final String htmlIndex =
                     "<html><b>" +
@@ -269,7 +269,7 @@ class HL7TableViewer extends JPanel {
                     plainIndex.substring(dash) +
                     "</html>";
 
-            hl7TableData.addRow(new Object[]{ htmlIndex, row.getValue() });
+            hl7TableData.addRow(new Object[]{htmlIndex, row.second()});
         }
         return hl7TableData.getRowCount() != 0;
     }
