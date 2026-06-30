@@ -1,15 +1,21 @@
 package hl7Viewer.nonGui.config;
 
-public class IniItem<T> {
+public abstract class AbstractIniItem<T> {
     private String section;
+
     private String key;
+
     private T value;
 
-    public IniItem(String section, String key, T value) {
+
+    public AbstractIniItem(String section, String key, T value) {
         this.section = section;
         this.key = key;
         this.value = value;
     }
+
+
+    public abstract void convertAndSetValue(final String rawVal);
 
 
     public T getValue() {
