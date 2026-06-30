@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-public abstract class AbstractFileReaderWriter implements IFileReader, IFileWriter{
+public abstract class AbstractFileReaderWriter implements IFileReader, IFileWriter {
     private String fileName;
     private String line;
 
@@ -23,9 +23,15 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
         try (final var bufferedReader =
                      new BufferedReader(new java.io.FileReader(fileName))
         ) {
-            String line = null;
-            while ((line = bufferedReader.readLine()) != null)
-                onReadLine(line);
+            String fileLine = null;
+            while ((fileLine = bufferedReader.readLine()) != null) {
+                fileLine = fileLine.trim();
+
+                if (fileLine.isEmpty())
+                    continue;
+
+                onReadLine(fileLine);
+            }
 
             success = true;
         } catch (IOException e) {
