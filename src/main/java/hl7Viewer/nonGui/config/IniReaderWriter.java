@@ -2,14 +2,29 @@ package hl7Viewer.nonGui.config;
 
 import hl7Viewer.nonGui.AbstractFileReaderWriter;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
+
+/**
+ * Reads and writes INI files. Parsed key-value pairs are stored in {@code outConfigMap}
+ * keyed as {@code section + IniTokens.KEY_SEPARATOR.value + key}
+ * and are intended to be transferred to {@link IniConfig}.
+ * Comments and blank lines are discarded on read and are not written back on save.
+ */
 public class IniReaderWriter extends AbstractFileReaderWriter {
 
+    /**
+     * Character tokens that define the INI file format.
+     * Used during both parsing and output generation.
+     */
     public enum IniTokens {
         COMMENT(';'),
         SECTION_BEGIN('['),
         SECTION_END(']'),
-        PAIR('=');
+        PAIR('='),
+        KEY_SEPARATOR('.');
 
         public final char value;
 
@@ -20,51 +35,55 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
     }
 
 
-    private static IniReaderWriter iniReaderWriter = null;
 
     private String sectionHeader;
 
-    final private IniConfig config;
+    final private Map<String, String> outConfigMap = new LinkedHashMap<>();
+
 
     /**
-     * <p>Used to grab the singleton class instance.
-     * If the static field is null, then a new instance is created
-     * and the same instance will be returned if called again<p/>
-     * @param config configuration class that values will be stored in memory to.
-     * @return the singleton IniReaderWriter instance
+     * Constructs a new {@link  IniReaderWriter} and sets
+     * its parent class filepath as the default {@code config.ini} for later methods to use.
+     *
      */
-    public IniReaderWriter getInstance(final IniConfig config) {
-        IniReaderWriter instance;
-        if (iniReaderWriter == null) {
-            instance = new IniReaderWriter(config);
-            iniReaderWriter = instance;
-        }
-
-        return iniReaderWriter;
+    IniReaderWriter() {
+        super("config.ini");
     }
 
     /**
-     * <p>Used to grab the singleton class instance.
-     * Overloaded method that makes it easier
-     * <p/>
-     * @return the singleton IniReaderWriter instance
-     * @throws IllegalArgumentException If iniReaderWriter has not been instantiated.
-     * This class requires a config object to be set first
+     * Constructs a new {@link  IniReaderWriter} and sets
+     * parent class filepath for later methods to use.
+     *
+     * @param filePath filepath of where the file is located
      */
-    public IniReaderWriter getInstance() throws IllegalArgumentException {
-        if (iniReaderWriter == null)
-            throw new IllegalArgumentException("Cannot use this overloaded getInstance method." +
-                            " You'll need to use the method that expects a config argument");
-
-        return iniReaderWriter;
+    IniReaderWriter(final String filePath) {
+        super(filePath);
     }
 
 
-    public IniConfig getConfig() {
-        return config;
+    /** Returns the parsed key-value pairs keyed
+     * as {@code section + IniTokens.KEY_SEPARATOR.value + key}. */
+    public Map<String, String> getOutConfigMap() {
+        return outConfigMap;
+    }
+
+    /** Clears all parsed entries from the map. */
+    public void clearOutConfigMap() {
+        outConfigMap.clear();
+    }
+
+    /** Returns {@code true} if the map contains at least one parsed entry. */
+    public boolean outConfigMapHasItems() {
+        return !outConfigMap.isEmpty();
     }
 
 
+    /**
+     * Parses a single line from the INI file.
+     * Called from {@link #read()}. Ignores comments, extracts section headers,
+     * and stores valid key=value pairs into {@code outConfigMap}.
+     * @param line String line that is passed into by {@link #read()}
+     */
     @Override
     protected void onReadLine(final String line) {
         final var firstChar = line.charAt(0);
@@ -73,8 +92,10 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
             return;
 
         if(firstChar == IniTokens.SECTION_BEGIN.value) {
-            if (line.charAt(line.length() - 1) == IniTokens.SECTION_END.value)
-                sectionHeader = line.substring( 1, line.length() - 2).trim();
+            final var lineEnd = line.length() - 1;
+
+            if (line.charAt(lineEnd) == IniTokens.SECTION_END.value)
+                sectionHeader = line.substring( 1, lineEnd).trim();
 
             return;
         }
@@ -85,19 +106,10 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
             final var key = pair[0].trim();
             final var value = pair[1].trim();
 
-            config.assignValue(sectionHeader, key, value);
+            if (!key.isEmpty() && !value.isEmpty()) {
+                final var configKey = IniConfig.makeMapKey(sectionHeader, key);
+                outConfigMap.putIfAbsent(configKey, value);
+            }
         }
-    }
-
-
-    @Override
-    protected void onWriteLine() {
-        // do nothing
-    }
-
-
-    private IniReaderWriter(final IniConfig config) {
-        super("config.ini");
-        this.config = config;
     }
 }
