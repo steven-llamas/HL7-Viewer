@@ -1,6 +1,5 @@
 package hl7Viewer.nonGui.config;
 
-import hl7Viewer.nonGui.AbstractFileReaderWriter;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
