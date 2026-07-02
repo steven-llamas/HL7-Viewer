@@ -11,13 +11,13 @@ public class HL7Message extends HL7Base<HL7Segment> {
         final List<Pair<String, String>> rows = new ArrayList<>();
 
         for (final var segment : items) {
-            final String segName = segment.getSegmentName();
+            final var segName = segment.getSegmentName();
 
             for (var j = 0; j < segment.getItems().size(); ++j) {
                 final var field = segment.getItems().get(j);
 
                 final int fieldIndex =
-                        (segName.equals("MSH") && j != 0)
+                        (segName.equalsIgnoreCase("MSH") && j != 0)
                                 ? j + 1
                                 : j;
 
