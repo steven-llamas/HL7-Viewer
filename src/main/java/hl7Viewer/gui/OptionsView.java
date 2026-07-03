@@ -74,7 +74,7 @@ public class OptionsView implements IView {
 
     private JPanel buildButtonPanel() {
         final var panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        panel.setOpaque(false);
+        Utilities.setPanelColors(panel);
         panel.add(new Button("Save",   this::onSave));
         panel.add(new Button("Cancel", this::onCancel));
         return panel;
@@ -120,6 +120,11 @@ public class OptionsView implements IView {
         Theme.CONTROL_COLOR = secondaryColor;
         Theme.GRID_COLOR  = tertiaryColor;
         Theme.TEXT_COLOR      = textColor;
+
+        JOptionPane.showMessageDialog(null,
+                "Settings saved.",
+                "Saved", JOptionPane.INFORMATION_MESSAGE);
+        closeParentWindow();
     }
 
 
@@ -130,6 +135,14 @@ public class OptionsView implements IView {
         secondaryColorField.setText(    Theme.toHex(secondaryColor) );
         tertiaryColorField.setText(     Theme.toHex(tertiaryColor)  );
         textColorField.setText(         Theme.toHex(textColor)      );
+        closeParentWindow();
+    }
+
+
+    private void closeParentWindow() {
+        final var window = SwingUtilities.getWindowAncestor(boldHL7IndexBox);
+        if (window != null)
+            window.dispose();
     }
 
 

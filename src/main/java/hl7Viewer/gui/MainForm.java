@@ -49,7 +49,13 @@ public class MainForm extends JFrame {
 
         menuBar.createMenuWithItem("File",
                 "Options",
-                () -> navigator.show(new OptionsView(config)));
+                () -> {
+                    final var dialog = new JDialog(this, "Options", true);
+                    dialog.setContentPane(new OptionsView(config).createPanel());
+                    dialog.pack();
+                    dialog.setLocationRelativeTo(this);
+                    dialog.setVisible(true);
+                });
 
 
         final var hl7ParseViewer = new HL7ParseViewer(new BasicMessageParser(config), config);
