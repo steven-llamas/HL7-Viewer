@@ -4,9 +4,9 @@ import javax.swing.*;
 
 public class MenuBar extends JMenuBar {
 
-    public MenuBar(MainForm mainForm) {
+    public MenuBar() {
         Utilities.setPanelColors(this);
-        this.setBorder(BorderFactory.createLineBorder(Utilities.SECONDARY_COLOR, 2));
+        this.setBorder(BorderFactory.createLineBorder(Theme.SECONDARY_COLOR, 2));
     }
 
     public void createMenuWithItem(String menuName, String itemName, Runnable action) {
@@ -28,7 +28,7 @@ public class MenuBar extends JMenuBar {
                 return menu;
         }
         var newMenu = new JMenu(menuName);
-        newMenu.setForeground(Utilities.TEXT_COLOR);
+        newMenu.setForeground(Theme.TEXT_COLOR);
         newMenu.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         JPopupMenu popup = newMenu.getPopupMenu();
         popup.setBorder(BorderFactory.createEmptyBorder());

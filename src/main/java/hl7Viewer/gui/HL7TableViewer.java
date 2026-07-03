@@ -96,9 +96,9 @@ public class HL7TableViewer extends JPanel {
         jTable = new JTable(hl7TableData);
         jTable.getColumnModel().getColumn(1).setCellRenderer(new TextRenderer());
         jTable.setOpaque(false);
-        jTable.setBackground(Utilities.TRANSPARENT_COLOR);
-        jTable.setForeground(Utilities.TEXT_COLOR);
-        jTable.setGridColor(Utilities.TERTIARY_COLOR);
+        jTable.setBackground(Theme.TRANSPARENT_COLOR);
+        jTable.setForeground(Theme.TEXT_COLOR);
+        jTable.setGridColor(Theme.TERTIARY_COLOR);
         jTable.setFont(new Font("SansSerif", Font.PLAIN, 12));
         jTable.setRowHeight(22);
         jTable.setFillsViewportHeight(true);
@@ -107,7 +107,7 @@ public class HL7TableViewer extends JPanel {
         final var header = jTable.getTableHeader();
         header.setReorderingAllowed(false);
         header.setResizingAllowed(false);
-        header.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Utilities.TERTIARY_COLOR));
+        header.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Theme.TERTIARY_COLOR));
         Utilities.setPanelColors(header);
 
         add(getJScrollPane(), BorderLayout.CENTER);
@@ -117,10 +117,10 @@ public class HL7TableViewer extends JPanel {
     private JScrollPane getJScrollPane() {
         final var scrollPane = new JScrollPane(jTable);
         scrollPane.setOpaque(false);
-        scrollPane.setBackground(Utilities.TRANSPARENT_COLOR);
+        scrollPane.setBackground(Theme.TRANSPARENT_COLOR);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getViewport().setOpaque(false);
-        scrollPane.getViewport().setBackground(Utilities.TRANSPARENT_COLOR);
+        scrollPane.getViewport().setBackground(Theme.TRANSPARENT_COLOR);
         scrollPane.setViewportBorder(null);
         return scrollPane;
     }
@@ -154,7 +154,7 @@ public class HL7TableViewer extends JPanel {
                 label.setHorizontalAlignment(SwingConstants.CENTER);
 
                 if (column < table.getColumnCount() - 1)
-                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Utilities.TERTIARY_COLOR));
+                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Theme.TERTIARY_COLOR));
                 else
                     label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 

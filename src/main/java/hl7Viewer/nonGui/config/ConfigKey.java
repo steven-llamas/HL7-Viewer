@@ -8,8 +8,13 @@ public enum ConfigKey {
     SCREEN_WIDTH ("Application", "screen_width","Width of the main application window in pixels."),
     SCREEN_HEIGHT("Application", "screen_height","Height of the main application window in pixels."),
 
-    BOLD_HL7_INDEX  ("HL7Setting", "bold_index", "Whether the HL7 segment index column is displayed in bold."),
-    IGNORE_MSH_CHECK("HL7Setting", "ignore_msh_check","Skips the MSH segment presence check during parsing.");
+    BOLD_HL7_INDEX  ("HL7Setting", "bold_index",        "Whether the HL7 segment index column is displayed in bold."),
+    IGNORE_MSH_CHECK("HL7Setting", "ignore_msh_check", "Skips the MSH segment presence check during parsing."),
+
+    COLOR_PRIMARY  ("Theme", "primary_color",   "Background color for panels and dialogs."),
+    COLOR_SECONDARY("Theme", "secondary_color", "Border and button background color."),
+    COLOR_TERTIARY ("Theme", "tertiary_color",  "Grid and separator color."),
+    COLOR_TEXT     ("Theme", "text_color",      "Foreground text and accent color.");
 
 
     public final String section;

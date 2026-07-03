@@ -1,23 +1,25 @@
 package hl7Viewer.gui;
 
+import hl7Viewer.AppInfo;
+import hl7Viewer.nonGui.config.IniConfig;
 import hl7Viewer.nonGui.hl7Parser.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-public class HL7ParseViewer {
+public class HL7ParseViewer implements IView {
     private final IHL7Parser parser;
 
     private final HL7TableViewer hl7TableViewer;
 
     public HL7ParseViewer(final IHL7Parser parser,
-                          final  HL7TableViewer hl7TableViewer) {
+                          final IniConfig config) {
         this.parser = parser;
-        this.hl7TableViewer = hl7TableViewer;
+        this.hl7TableViewer = new HL7TableViewer(config);
     }
 
-
+    @Override
     public JPanel createPanel() {
         final var outerPanel = createAndSetHl7ViewerPanel();
         final var mainPanel = createAndSetInputAndOutputPanel();
@@ -56,7 +58,7 @@ public class HL7ParseViewer {
 
 
     private static boolean pressedCtrlAndEnter(KeyEvent e) {
-        final var buttonHeld = Utilities.IS_MAC_OS
+        final var buttonHeld = AppInfo.IS_MAC_OS
                 ? e.isMetaDown()
                 : e.isControlDown();
         return buttonHeld && e.getKeyCode() == KeyEvent.VK_ENTER;
@@ -114,7 +116,7 @@ public class HL7ParseViewer {
 
         messageTextBox.setBorder(
                 BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(Utilities.SECONDARY_COLOR, 2),
+                        BorderFactory.createLineBorder(Theme.SECONDARY_COLOR, 2),
                         Utilities.addPadding(10, 10, 10, 10)
         ));
 

@@ -8,8 +8,8 @@ public class Button extends JButton {
         super(label);
         setOpaque(true);
         setBorderPainted(false);
-        setBackground(Utilities.SECONDARY_COLOR);
-        setForeground(Utilities.TEXT_COLOR);
+        setBackground(Theme.SECONDARY_COLOR);
+        setForeground(Theme.TEXT_COLOR);
         addActionListener(e -> action.run());
     }
 }
