@@ -1,14 +1,15 @@
 package hl7Viewer.nonGui.config;
 
 
+import hl7Viewer.gui.Theme;
+
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 
 public class IniConfig {
-
-
     private final Map<String, String> configMap;
 
     private final IniReaderWriter readerWriter;
@@ -42,45 +43,27 @@ public class IniConfig {
     }
 
 
+    /** Returns the Color for the given key, or {@code defaultValue} if absent or invalid hex. */
+    public Color get(final ConfigKey key, final Color defaultValue) {
+        final var value = configMap.get(makeMapKey(key.section, key.key));
+        return (value == null || value.isEmpty())
+                ? defaultValue
+                : Theme.parseColor(value, defaultValue);
+    }
+
+
     /** Returns the boolean value for the given key, or {@code defaultValue} if absent. */
-    public boolean getBoolean(final ConfigKey key, final boolean defaultValue) {
-        return getBoolean(key.section, key.key, defaultValue);
-    }
-
-
-    /** Returns the int value for the given key, or {@code defaultValue} if absent or unparseable. */
-    public int getInt(final ConfigKey key, final int defaultValue) {
-        return getInt(key.section, key.key, defaultValue);
-    }
-
-
-    /** Returns the string value for the given key, or {@code defaultValue} if absent. */
-    public String getString(final ConfigKey key, final String defaultValue) {
-        return getString(key.section, key.key, defaultValue);
-    }
-
-
-    /** Sets a value in memory. Changes are not persisted until {@link #save()} is called. */
-    public void set(final ConfigKey key, final Object newValue) {
-        set(key.section, key.key, newValue);
-    }
-
-
-    /** Returns the boolean value for the given section/key,
-     *  or {@code defaultValue} if absent. */
-    private boolean getBoolean(final String section,
-                              final String key,
-                              final boolean defaultValue) {
-        final var value = configMap.get(makeMapKey(section, key));
+    public boolean get(final ConfigKey key, final boolean defaultValue) {
+        final var value = configMap.get(makeMapKey(key.section, key.key));
         return (value == null || value.isEmpty())
                 ? defaultValue
                 : Boolean.parseBoolean(value);
     }
 
 
-    /** Returns the int value for the given section/key, or {@code defaultValue} if absent or unparseable. */
-    private int getInt(final String section, final String key, final int defaultValue) {
-        final var value = configMap.get(makeMapKey(section, key));
+    /** Returns the int value for the given key, or {@code defaultValue} if absent or unparseable. */
+    public int get(final ConfigKey key, final int defaultValue) {
+        final var value = configMap.get(makeMapKey(key.section, key.key));
         if (value == null || value.isEmpty())
             return defaultValue;
 
@@ -91,12 +74,35 @@ public class IniConfig {
         }
     }
 
-    /** Returns the string value for the given section/key, or {@code defaultValue} if absent. */
-    private String getString(final String section, final String key, final String defaultValue) {
-        final var value = configMap.get(makeMapKey(section, key));
+
+    /** Returns the string value for the given key, or {@code defaultValue} if absent. */
+    public String get(final ConfigKey key, final String defaultValue) {
+        final var value = configMap.get(makeMapKey(key.section, key.key));
         return (value == null || value.isEmpty())
                 ? defaultValue
                 : value;
+    }
+
+
+    public void set(final ConfigKey key, final int value) {
+        set(key.section, key.key, value);
+    }
+
+
+    public void set(final ConfigKey key, final boolean value) {
+        set(key.section, key.key, value);
+    }
+
+
+    public void set(final ConfigKey key, final String value) {
+        if (value != null && !value.trim().isBlank())
+            set(key.section, key.key, value);
+    }
+
+
+    public void set(final ConfigKey key, final Color value) {
+        if (value != null)
+            set(key.section, key.key, Theme.toHex(value));
     }
 
 

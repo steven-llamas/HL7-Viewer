@@ -27,7 +27,7 @@ public class BasicMessageParser implements IHL7Parser {
 
 
         Pair<Boolean, String> validPair =
-                HL7Validator.validateStructure(message, config.getBoolean(IGNORE_MSH_CHECK, false));
+                HL7Validator.validateStructure(message, config.get(IGNORE_MSH_CHECK, false));
         if (!validPair.first())
             throw new IllegalArgumentException(validPair.second());
 

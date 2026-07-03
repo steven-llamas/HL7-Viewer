@@ -27,59 +27,59 @@ class IniConfigTest {
     class GetValueTests {
 
         @Test
-        @DisplayName("getBoolean should return parsed value")
-        void getBoolean_ReturnsParsedValue(@TempDir Path dir) throws IOException {
+        @DisplayName("get should return parsed boolean value")
+        void get_ReturnsParsedBooleanValue(@TempDir Path dir) throws IOException {
             final var config = configFrom(dir, "[HL7Setting]\nbold_index=true");
 
-            assertTrue(config.getBoolean(ConfigKey.BOLD_HL7_INDEX, false));
+            assertTrue(config.get(ConfigKey.BOLD_HL7_INDEX, false));
         }
 
         @Test
-        @DisplayName("getBoolean should return default when key is absent")
-        void getBoolean_ReturnsDefaultWhenAbsent(@TempDir Path dir) throws IOException {
+        @DisplayName("get should return default boolean when key is absent")
+        void get_ReturnsDefaultBooleanWhenAbsent(@TempDir Path dir) throws IOException {
             final var config = configFrom(dir, "[HL7Setting]\nother=true");
 
-            assertTrue(config.getBoolean(ConfigKey.BOLD_HL7_INDEX, true));
+            assertTrue(config.get(ConfigKey.BOLD_HL7_INDEX, true));
         }
 
         @Test
-        @DisplayName("getInt should return parsed value")
-        void getInt_ReturnsParsedValue(@TempDir Path dir) throws IOException {
+        @DisplayName("get should return parsed int value")
+        void get_ReturnsParsedIntValue(@TempDir Path dir) throws IOException {
             final var config = configFrom(dir, "[Application]\nscreen_width=143");
 
-            assertEquals(143, config.getInt(ConfigKey.SCREEN_WIDTH, 0));
+            assertEquals(143, config.get(ConfigKey.SCREEN_WIDTH, 0));
         }
 
         @Test
-        @DisplayName("getInt should return default when key is absent")
-        void getInt_ReturnsDefaultWhenAbsent(@TempDir Path dir) throws IOException {
+        @DisplayName("get should return default int when key is absent")
+        void get_ReturnsDefaultIntWhenAbsent(@TempDir Path dir) throws IOException {
             final var config = configFrom(dir, "[Application]\nother=143");
 
-            assertEquals(99, config.getInt(ConfigKey.SCREEN_WIDTH, 99));
+            assertEquals(99, config.get(ConfigKey.SCREEN_WIDTH, 99));
         }
 
         @Test
-        @DisplayName("getInt should return default when value is not a number")
-        void getInt_ReturnsDefaultWhenUnparseable(@TempDir Path dir) throws IOException {
+        @DisplayName("get should return default int when value is not a number")
+        void get_ReturnsDefaultIntWhenUnparseable(@TempDir Path dir) throws IOException {
             final var config = configFrom(dir, "[Application]\nscreen_width=notanumber");
 
-            assertEquals(99, config.getInt(ConfigKey.SCREEN_WIDTH, 99));
+            assertEquals(99, config.get(ConfigKey.SCREEN_WIDTH, 99));
         }
 
         @Test
-        @DisplayName("getString should return parsed value")
-        void getString_ReturnsParsedValue(@TempDir Path dir) throws IOException {
+        @DisplayName("get should return parsed string value")
+        void get_ReturnsParsedStringValue(@TempDir Path dir) throws IOException {
             final var config = configFrom(dir, "[Application]\nscreen_width=1920");
 
-            assertEquals("1920", config.getString(ConfigKey.SCREEN_WIDTH, ""));
+            assertEquals("1920", config.get(ConfigKey.SCREEN_WIDTH, ""));
         }
 
         @Test
-        @DisplayName("getString should return default when key is absent")
-        void getString_ReturnsDefaultWhenAbsent(@TempDir Path dir) throws IOException {
+        @DisplayName("get should return default string when key is absent")
+        void get_ReturnsDefaultStringWhenAbsent(@TempDir Path dir) throws IOException {
             final var config = configFrom(dir, "[Application]\nother=1920");
 
-            assertEquals("default", config.getString(ConfigKey.SCREEN_WIDTH, "default"));
+            assertEquals("default", config.get(ConfigKey.SCREEN_WIDTH, "default"));
         }
     }
 
@@ -94,7 +94,7 @@ class IniConfigTest {
             final var config = configFrom(dir, "[Application]\nscreen_width=1000");
             config.set(ConfigKey.SCREEN_WIDTH, 1920);
 
-            assertEquals("1920", config.getString(ConfigKey.SCREEN_WIDTH, ""));
+            assertEquals("1920", config.get(ConfigKey.SCREEN_WIDTH, ""));
         }
 
         @Test
