@@ -1,6 +1,7 @@
 package hl7Viewer.gui;
 
 
+import hl7Viewer.AppInfo;
 import hl7Viewer.nonGui.config.ConfigKey;
 import hl7Viewer.nonGui.config.IniConfig;
 import hl7Viewer.nonGui.hl7Parser.BasicMessageParser;
@@ -16,41 +17,46 @@ public class MainForm extends JFrame {
 
     private final IniConfig config;
 
+    private Image appIcon;
+
     public MainForm(final IniConfig config) {
         this.config = config;
 
         setTitle("HL7 Viewer");
-        int screenWidth  = config.getInt(ConfigKey.SCREEN_WIDTH,  1000);
-        int screenHeight = config.getInt(ConfigKey.SCREEN_HEIGHT, 600);
+        int screenWidth  = config.get(ConfigKey.SCREEN_WIDTH,  1000);
+        int screenHeight = config.get(ConfigKey.SCREEN_HEIGHT, 600);
 
         setSize(screenWidth, screenHeight);
         setAppOnCenterOfScreen();
         setImageIcon();
         setWarningOnExit();
 
-        if (Utilities.IS_MAC_OS) {
+        if (AppInfo.IS_MAC_OS) {
             System.setProperty("apple.awt.application.name", "HL7 Viewer");
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
 
-        var menuBar = new MenuBar(this);
-//        menuBar.createMenuWithItem("File", "Settings", this::showMessageBuilderView);
-        menuBar.createMenuWithItem("View", "HL7 Parser", this::showHl7Viewer);
-//        menuBar.createMenuWithItem("View", "HL7 Builder", this::showMessageBuilderView);
-        setJMenuBar(menuBar);
-
         setBackground();
         contentPanel = setupContentPanel();
-        showHl7Viewer();
-    }
+
+        final var navigator = new ViewNavigator(this::panelRefresher);
+
+        final var menuBar = new MenuBar();
+
+        menuBar.createMenuWithItem("File",
+                "About",
+                () -> new AboutDialog(this, appIcon).display());
+
+        menuBar.createMenuWithItem("File",
+                "Options",
+                () -> navigator.show(new OptionsView(config)));
 
 
-    public void showHl7Viewer() {
-        final JPanel parserPanel =
-                new HL7ParseViewer(new BasicMessageParser(config), new HL7TableViewer(config))
-                .createPanel();
-        panelRefresher(parserPanel);
+        final var hl7ParseViewer = new HL7ParseViewer(new BasicMessageParser(config), config);
+        menuBar.createMenuWithItem("View", "HL7 Parser", () -> navigator.show(hl7ParseViewer));
+        setJMenuBar(menuBar);
 
+        navigator.show(hl7ParseViewer);
     }
 
 
@@ -63,11 +69,12 @@ public class MainForm extends JFrame {
         final var iconURL = getClass().getResource("/images/icon.png");
         assert iconURL != null;
         final var image = new ImageIcon(iconURL);
-        setIconImage(image.getImage());
+        appIcon = image.getImage();
+        setIconImage(appIcon);
 
-        if (Utilities.IS_MAC_OS){
+        if (AppInfo.IS_MAC_OS){
             try {
-                Taskbar.getTaskbar().setIconImage(image.getImage());
+                Taskbar.getTaskbar().setIconImage(appIcon);
             } catch (UnsupportedOperationException e) {
                 // do nothing
             }
@@ -84,6 +91,7 @@ public class MainForm extends JFrame {
                         "Are you sure you want to exit",
                         "Exit", JOptionPane.YES_NO_OPTION);
                 if (ifClickedYes(option)) {
+                    onShutdown();
                     MainForm.this.dispose();
                 }
             }
@@ -92,7 +100,7 @@ public class MainForm extends JFrame {
 
 
     private void setBackground() {
-        getContentPane().setBackground(Utilities.PRIMARY_COLOR);
+        getContentPane().setBackground(Theme.BACKGROUND_COLOR);
     }
 
 
@@ -107,10 +115,18 @@ public class MainForm extends JFrame {
 
     //removes panels and adds new panels
     private void panelRefresher(JPanel mainPanel) {
+        getContentPane().setBackground(Theme.BACKGROUND_COLOR);
         contentPanel.removeAll();
         contentPanel.add(mainPanel, BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
+    }
+
+
+    private void onShutdown() {
+        config.set(ConfigKey.SCREEN_WIDTH,  getWidth());
+        config.set(ConfigKey.SCREEN_HEIGHT, getHeight());
+        config.save();
     }
 
 
