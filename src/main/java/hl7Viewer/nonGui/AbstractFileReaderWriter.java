@@ -80,7 +80,7 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
                 final String writeLine = onWriteLine(item);
                 bufferedWriter.write(writeLine);
                 bufferedWriter.newLine();
-                System.out.println("Wrote:\t" + writeLine + " to file ");
+                System.out.println("Wrote:\t" + writeLine + "\t to " + filePath);
             }
 
             success = true;

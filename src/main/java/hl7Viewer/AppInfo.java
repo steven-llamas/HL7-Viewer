@@ -11,15 +11,18 @@ public final class AppInfo {
     public static final boolean IS_MAC_OS =
             System.getProperty("os.name").toLowerCase().contains("mac");
 
-    public static final String CONFIG_PATH = resolveConfigPath();
+    public static final String CONFIG_PATH = resolvePath("config.ini");
 
-    private static String resolveConfigPath() {
+    public static String resolvePath(final String filename) {
+        if (!isJar())
+            return filename;
+
         try {
             final var binDir = new File(AppInfo.class.getProtectionDomain()
                     .getCodeSource().getLocation().toURI()).getParent();
-            return binDir + File.separator + "config.ini";
+            return binDir + File.separator + filename;
         } catch (URISyntaxException e) {
-            return "config.ini";
+            return filename;
         }
     }
 
