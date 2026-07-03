@@ -15,6 +15,8 @@ public class HL7TableViewer extends JPanel {
 
     private DefaultTableModel hl7TableData;
 
+    private JViewport viewport;
+
     private final IniConfig config;
 
 
@@ -67,7 +69,7 @@ public class HL7TableViewer extends JPanel {
                 var value = jTable.getValueAt(i, j)
                         .toString();
 
-                if (config.getBoolean(BOLD_HL7_INDEX, true))
+                if (config.get(BOLD_HL7_INDEX, true))
                     value = value.replaceAll("<[^>]*>", "");
 
                 contents.append(value).append("\t");
@@ -80,6 +82,27 @@ public class HL7TableViewer extends JPanel {
                 .setContents(
                         new java.awt.datatransfer.StringSelection(
                                 contents.toString()), null);
+    }
+
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        applyTheme();
+    }
+
+
+    private void applyTheme() {
+        jTable.setForeground(Theme.TEXT_COLOR);
+        jTable.setGridColor(Theme.GRID_COLOR);
+
+        viewport.setBackground(Theme.BACKGROUND_COLOR);
+
+        final var header = jTable.getTableHeader();
+        header.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Theme.GRID_COLOR));
+        Utilities.setPanelColors(header);
+
+        repaint();
     }
 
 
@@ -97,8 +120,6 @@ public class HL7TableViewer extends JPanel {
         jTable.getColumnModel().getColumn(1).setCellRenderer(new TextRenderer());
         jTable.setOpaque(false);
         jTable.setBackground(Theme.TRANSPARENT_COLOR);
-        jTable.setForeground(Theme.TEXT_COLOR);
-        jTable.setGridColor(Theme.TERTIARY_COLOR);
         jTable.setFont(new Font("SansSerif", Font.PLAIN, 12));
         jTable.setRowHeight(22);
         jTable.setFillsViewportHeight(true);
@@ -107,10 +128,9 @@ public class HL7TableViewer extends JPanel {
         final var header = jTable.getTableHeader();
         header.setReorderingAllowed(false);
         header.setResizingAllowed(false);
-        header.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Theme.TERTIARY_COLOR));
-        Utilities.setPanelColors(header);
 
         add(getJScrollPane(), BorderLayout.CENTER);
+        applyTheme();
     }
 
 
@@ -119,9 +139,12 @@ public class HL7TableViewer extends JPanel {
         scrollPane.setOpaque(false);
         scrollPane.setBackground(Theme.TRANSPARENT_COLOR);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.getViewport().setBackground(Theme.TRANSPARENT_COLOR);
         scrollPane.setViewportBorder(null);
+
+        viewport = scrollPane.getViewport();
+        viewport.setOpaque(true);
+        viewport.setBackground(Theme.BACKGROUND_COLOR);
+
         return scrollPane;
     }
 
@@ -132,7 +155,7 @@ public class HL7TableViewer extends JPanel {
             final int dash = plainIndex.indexOf('-');
 
             final String finalIndex =
-                    (config.getBoolean(BOLD_HL7_INDEX, true))
+                    (config.get(BOLD_HL7_INDEX, true))
                     ? "<html><b>" + plainIndex.substring(0, dash) + "</b>" + plainIndex.substring(dash) + "</html>"
                     : plainIndex;
 
@@ -154,7 +177,7 @@ public class HL7TableViewer extends JPanel {
                 label.setHorizontalAlignment(SwingConstants.CENTER);
 
                 if (column < table.getColumnCount() - 1)
-                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Theme.TERTIARY_COLOR));
+                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Theme.GRID_COLOR));
                 else
                     label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
