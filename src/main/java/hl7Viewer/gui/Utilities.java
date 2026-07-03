@@ -9,9 +9,12 @@ public class Utilities {
     public static final Color TRANSPARENT_COLOR = new Color(0,0,0,0);
     public static final Color PRIMARY_COLOR = Color.decode("#2F2D2D");
     public static final Color SECONDARY_COLOR = Color.decode("#484444");
-    public static final Color TERCIARY_COLOR = Color.decode("#616161");
+    public static final Color TERTIARY_COLOR = Color.decode("#616161");
     public static final Color TEXT_COLOR = Color.decode("#1aab00");
 
+
+    public static final boolean IS_MAC_OS =
+            System.getProperty("os.name").toLowerCase().contains("mac");
 
     //method that allows you to specify how much padding you want
     public static EmptyBorder addPadding(int top, int left, int bottom, int right ){
@@ -45,14 +48,13 @@ public class Utilities {
         var titleLabel = new JLabel(titleText, SwingConstants.CENTER);
         setPanelColors(titleLabel);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
-        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, 16f));
         titleLabel.setBorder(addPadding(8, 0, 8, 0));
         mainPanel.add(titleLabel, BorderLayout.NORTH);
     }
 
     //creates scroll pane and customizes it
-    public static void createAndSetScrollPane(JTextArea JTextArea, JPanel JPanel) {
-        var scrollPane = new JScrollPane(JTextArea);
+    public static void createAndSetScrollPane(JTextArea textArea, JPanel panel) {
+        var scrollPane = new JScrollPane(textArea);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setOpaque(false);
         scrollPane.setBackground(TRANSPARENT_COLOR);
@@ -60,13 +62,7 @@ public class Utilities {
         scrollPane.getViewport().setBackground(TRANSPARENT_COLOR);
         scrollPane.setViewportBorder(null);
 
-        JPanel.add(scrollPane, BorderLayout.CENTER);
-    }
-
-    //used to set color of buttons
-    public static void setButtonColors(JButton useJsonBtn) {
-        useJsonBtn.setBackground(SECONDARY_COLOR);
-        useJsonBtn.setForeground(TEXT_COLOR);
+        panel.add(scrollPane, BorderLayout.CENTER);
     }
 
     //sets TextBox colors
