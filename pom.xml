@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>hl7</groupId>
     <artifactId>Hl7parser</artifactId>
-    <version>0.2</version>
+    <version>1.0.4</version>
 
     <properties>
         <maven.compiler.source>24</maven.compiler.source>
@@ -106,6 +106,8 @@
                                         <argument>${project.build.finalName}-shaded.jar</argument>
                                         <argument>--icon</argument>
                                         <argument>src/main/resources/icons/mac/icon.icns</argument>
+                                        <argument>--app-version</argument>
+                                        <argument>${project.version}</argument>
                                         <argument>--type</argument>
                                         <argument>dmg</argument>
                                         <argument>--dest</argument>
@@ -153,6 +155,8 @@
                                         <argument>hl7Viewer.Main</argument>
                                         <argument>--icon</argument>
                                         <argument>src/main/resources/icons/windows/icon.ico</argument>
+                                        <argument>--app-version</argument>
+                                        <argument>${project.version}</argument>
                                         <argument>--type</argument>
                                         <argument>msi</argument>
                                         <argument>--dest</argument>

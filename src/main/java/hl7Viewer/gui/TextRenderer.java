@@ -22,12 +22,12 @@ public class TextRenderer extends JTextArea implements javax.swing.table.TableCe
 
         setText((value == null) ? "" : value.toString());
 
-        if(isSelected) {
+        if (isSelected) {
             setBackground(table.getSelectionBackground());
             setForeground(table.getSelectionForeground());
         } else {
-            setBackground(Utilities.TRANSPARENT_COLOR);
-            setForeground(Utilities.TEXT_COLOR);
+            setBackground(Theme.TRANSPARENT_COLOR);
+            setForeground(Theme.TEXT_COLOR);
         }
 
         setBorder(Utilities.addPadding(2,2,2,2));

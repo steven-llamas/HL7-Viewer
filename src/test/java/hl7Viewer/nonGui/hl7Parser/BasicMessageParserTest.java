@@ -1,5 +1,7 @@
-package hl7Viewer.nonGui.parser;
+package hl7Viewer.nonGui.hl7Parser;
 
+import hl7Viewer.nonGui.config.IniConfig;
+import hl7Viewer.nonGui.config.IniReaderWriter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,10 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class BasicMessageParserTest {
     private BasicMessageParser parser;
 
+    private static BasicMessageParser defaultParser() {
+        return new BasicMessageParser(new IniConfig(new IniReaderWriter()));
+    }
 
     @BeforeEach
     void setUp() {
-        parser = new BasicMessageParser();
+        parser = defaultParser();
     }
 
 
@@ -104,7 +109,7 @@ class BasicMessageParserTest {
         @Test
         @DisplayName("should have 3 segments total")
         void msgShouldHaveThreeSegments() {
-            assertEquals(3, result.getSegments().size());
+            assertEquals(3, result.getItems().size());
         }
 
 
@@ -112,7 +117,7 @@ class BasicMessageParserTest {
         @DisplayName("should have MSH, PID and PV1 as their segment names")
         void msgShouldHaveCorrectSegmentHeaders() {
             final List<String> segHeaders = result
-                    .getSegments()
+                    .getItems()
                     .stream()
                     .map(HL7Segment::getSegmentName)
                     .toList();
@@ -128,11 +133,11 @@ class BasicMessageParserTest {
         @DisplayName("should contain PI12345 in PID-3 (Internal ID)")
         void msgShouldHavePI12345InPIDThree() {
             final var patID = result
-                    .getSegments().get(1)
-                    .getFieldList().get(3)
-                    .getRepetitionList().getFirst()
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().getFirst();
+                    .getItems().get(1)
+                    .getItems().get(3)
+                    .getItems().getFirst()
+                    .getItems().getFirst()
+                    .getItems().getFirst();
             assertEquals("PI12345", patID);
         }
 
@@ -141,18 +146,18 @@ class BasicMessageParserTest {
         @DisplayName("should have DOE, JOHN in PID-5 (Patient Name)")
         void msgShouldHaveDoeJohninPIDFive() {
             final var nameField = result
-                    .getSegments().get(1)
-                    .getFieldList().get(5);
+                    .getItems().get(1)
+                    .getItems().get(5);
 
             final var lName = nameField
-                    .getRepetitionList().getFirst()
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().getFirst();
+                    .getItems().getFirst()
+                    .getItems().getFirst()
+                    .getItems().getFirst();
 
             final var fName = nameField
-                    .getRepetitionList().getFirst()
-                    .getComponentList().get(1)
-                    .getSubcomponentList().getFirst();
+                    .getItems().getFirst()
+                    .getItems().get(1)
+                    .getItems().getFirst();
 
             assertEquals("DOE" , lName);
             assertEquals("JOHN", fName);
@@ -163,18 +168,18 @@ class BasicMessageParserTest {
         @DisplayName("Should have (555)555-1212 and (555)555-1313 in PID-13")
         void msgShouldHandleFieldRepetitionsInPIDThirteen() {
             final var pidPhoneNumField = result
-                    .getSegments().get(1)
-                    .getFieldList().get(13);
+                    .getItems().get(1)
+                    .getItems().get(13);
 
             final var phoneOne = pidPhoneNumField
-                    .getRepetitionList().getFirst()
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().getFirst();
+                    .getItems().getFirst()
+                    .getItems().getFirst()
+                    .getItems().getFirst();
 
             final var phoneTwo = pidPhoneNumField
-                    .getRepetitionList().get(1)
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().getFirst();
+                    .getItems().get(1)
+                    .getItems().getFirst()
+                    .getItems().getFirst();
 
 
             assertEquals("(555)555-1212", phoneOne);
@@ -186,11 +191,11 @@ class BasicMessageParserTest {
         @DisplayName("should trim and uppercase MSH-5 value (  Lab_System   )")
         void msgShouldTrimAndUpperCaseValuesInMSHFive() {
             final var mshFiveField = result
-                    .getSegments().getFirst()
-                    .getFieldList().get(4)
-                    .getRepetitionList().getFirst()
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().getFirst();
+                    .getItems().getFirst()
+                    .getItems().get(4)
+                    .getItems().getFirst()
+                    .getItems().getFirst()
+                    .getItems().getFirst();
 
             assertEquals("LAB_SYSTEM", mshFiveField);
         }
@@ -200,23 +205,23 @@ class BasicMessageParserTest {
         @DisplayName("should contain 123 MAIN ST, APT 4B and METROPOLIS as subcomponents in PID-11 (Patient Address)")
         void msgShouldHandleSubcomponentInPIDEleven() {
             final var pidAddressField = result
-                    .getSegments().get(1)
-                    .getFieldList().get(11);
+                    .getItems().get(1)
+                    .getItems().get(11);
 
             final var pidAddressCompOne = pidAddressField
-                    .getRepetitionList().getFirst()
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().getFirst();
+                    .getItems().getFirst()
+                    .getItems().getFirst()
+                    .getItems().getFirst();
 
             final var pidAddressCompTwo = pidAddressField
-                    .getRepetitionList().getFirst()
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().get(1);
+                    .getItems().getFirst()
+                    .getItems().getFirst()
+                    .getItems().get(1);
 
             final var pidAddressCompThree = pidAddressField
-                    .getRepetitionList().getFirst()
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().get(2);
+                    .getItems().getFirst()
+                    .getItems().getFirst()
+                    .getItems().get(2);
 
             assertEquals("123 MAIN ST", pidAddressCompOne);
             assertEquals("APT 4B", pidAddressCompTwo);
@@ -234,7 +239,7 @@ class BasicMessageParserTest {
 
         @BeforeEach
         void setUp() {
-            parser = new BasicMessageParser();
+            parser = defaultParser();
             String msgWCustomEnc = """
                     MSH!:*\\#!SENDING_APP!SENDING_FAC!REC_APP!REC_FAC!202310271030!!ADT:A01!12345!P!2.5
                     EVN!!202310271030
@@ -248,13 +253,13 @@ class BasicMessageParserTest {
         @Test
         @DisplayName("should contain 4 segments total")
         void msgShouldContainFourSegments() {
-            assertEquals(4, parsedMsg.getSegments().size());
+            assertEquals(4, parsedMsg.getItems().size());
         }
 
         @Test
         @DisplayName("should contain 12 fields in MSH")
         void msgShouldHaveTwelveFieldsInMsh() {
-            var mshFieldsSize = parsedMsg.getSegments().getFirst().getFieldList().size();
+            var mshFieldsSize = parsedMsg.getItems().getFirst().getItems().size();
             assertEquals(12, mshFieldsSize);
         }
 
@@ -262,18 +267,18 @@ class BasicMessageParserTest {
         @DisplayName("Should have 123-456-7987 and 126-555-0200 in PID-13")
         void msgShouldParseRepetitionsWithCustomEnc() {
             final var pidPhoneNumField = parsedMsg
-                    .getSegments().get(2)
-                    .getFieldList().get(13);
+                    .getItems().get(2)
+                    .getItems().get(13);
 
             final var phoneOne = pidPhoneNumField
-                    .getRepetitionList().getFirst()
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().getFirst();
+                    .getItems().getFirst()
+                    .getItems().getFirst()
+                    .getItems().getFirst();
 
             final var phoneTwo = pidPhoneNumField
-                    .getRepetitionList().get(1)
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().getFirst();
+                    .getItems().get(1)
+                    .getItems().getFirst()
+                    .getItems().getFirst();
 
 
             assertEquals("123-456-7987", phoneOne);
@@ -285,18 +290,18 @@ class BasicMessageParserTest {
         @DisplayName("should have ADT and A01 in MSH-9 (Message Type)")
         void msgShouldParseComponentsWithCustomEnc() {
             final var mshMsgTypeField = parsedMsg
-                    .getSegments().getFirst()
-                    .getFieldList().get(8);
+                    .getItems().getFirst()
+                    .getItems().get(8);
 
             final var mshTypeFirstComp = mshMsgTypeField
-                    .getRepetitionList().getFirst()
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().getFirst();
+                    .getItems().getFirst()
+                    .getItems().getFirst()
+                    .getItems().getFirst();
 
             final var mshTypeSecComp = mshMsgTypeField
-                    .getRepetitionList().getFirst()
-                    .getComponentList().get(1)
-                    .getSubcomponentList().getFirst();
+                    .getItems().getFirst()
+                    .getItems().get(1)
+                    .getItems().getFirst();
 
             assertEquals("ADT", mshTypeFirstComp);
             assertEquals("A01", mshTypeSecComp);
@@ -307,18 +312,18 @@ class BasicMessageParserTest {
         @DisplayName("should contain PATID1234 and FACILITY for PID-3")
         void msgShouldParseSubcomponentsWithCustomEnc() {
             final var getPidPatIDField = parsedMsg
-                    .getSegments().get(2)
-                    .getFieldList().get(3);
+                    .getItems().get(2)
+                    .getItems().get(3);
 
             final var pidPatIdFirstSubcomp = getPidPatIDField
-                    .getRepetitionList().getFirst()
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().getFirst();
+                    .getItems().getFirst()
+                    .getItems().getFirst()
+                    .getItems().getFirst();
 
             final var pidPatIdSecondSubcomp = getPidPatIDField
-                    .getRepetitionList().getFirst()
-                    .getComponentList().getFirst()
-                    .getSubcomponentList().get(3);
+                    .getItems().getFirst()
+                    .getItems().getFirst()
+                    .getItems().get(3);
 
             assertEquals("PATID1234", pidPatIdFirstSubcomp);
             assertEquals("FACILITY", pidPatIdSecondSubcomp);

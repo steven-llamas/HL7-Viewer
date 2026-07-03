@@ -1,6 +1,10 @@
 package hl7Viewer.gui;
 
 
+import hl7Viewer.AppInfo;
+import hl7Viewer.nonGui.config.ConfigKey;
+import hl7Viewer.nonGui.config.IniConfig;
+import hl7Viewer.nonGui.hl7Parser.BasicMessageParser;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -8,30 +12,57 @@ import java.awt.event.WindowEvent;
 
 
 public class MainForm extends JFrame {
+
     private final JPanel contentPanel;
 
-    public MainForm() {
+    private final IniConfig config;
+
+    private Image appIcon;
+
+    public MainForm(final IniConfig config) {
+        this.config = config;
 
         setTitle("HL7 Viewer");
-        setSize(1000, 600);
+        int screenWidth  = config.get(ConfigKey.SCREEN_WIDTH,  1000);
+        int screenHeight = config.get(ConfigKey.SCREEN_HEIGHT, 600);
+
+        setSize(screenWidth, screenHeight);
         setAppOnCenterOfScreen();
         setImageIcon();
         setWarningOnExit();
 
-        if (isMacOS()) {
+        if (AppInfo.IS_MAC_OS) {
             System.setProperty("apple.awt.application.name", "HL7 Viewer");
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
 
-        var menuBar = new MenuBar(this);
-//        menuBar.createMenuWithItem("File", "Settings", this::showMessageBuilderView);
-        menuBar.createMenuWithItem("View", "HL7 Parser", this::showHl7Viewer);
-//        menuBar.createMenuWithItem("View", "HL7 Builder", this::showMessageBuilderView);
-        setJMenuBar(menuBar);
-
         setBackground();
         contentPanel = setupContentPanel();
-        showHl7Viewer();
+
+        final var navigator = new ViewNavigator(this::panelRefresher);
+
+        final var menuBar = new MenuBar();
+
+        menuBar.createMenuWithItem("File",
+                "About",
+                () -> new AboutDialog(this, appIcon).display());
+
+        menuBar.createMenuWithItem("File",
+                "Options",
+                () -> {
+                    final var dialog = new JDialog(this, "Options", true);
+                    dialog.setContentPane(new OptionsView(config).createPanel());
+                    dialog.pack();
+                    dialog.setLocationRelativeTo(this);
+                    dialog.setVisible(true);
+                });
+
+
+        final var hl7ParseViewer = new HL7ParseViewer(new BasicMessageParser(config), config);
+        menuBar.createMenuWithItem("View", "HL7 Parser", () -> navigator.show(hl7ParseViewer));
+        setJMenuBar(menuBar);
+
+        navigator.show(hl7ParseViewer);
     }
 
 
@@ -44,11 +75,12 @@ public class MainForm extends JFrame {
         final var iconURL = getClass().getResource("/images/icon.png");
         assert iconURL != null;
         final var image = new ImageIcon(iconURL);
-        setIconImage(image.getImage());
+        appIcon = image.getImage();
+        setIconImage(appIcon);
 
-        if (isMacOS()){
+        if (AppInfo.IS_MAC_OS){
             try {
-                Taskbar.getTaskbar().setIconImage(image.getImage());
+                Taskbar.getTaskbar().setIconImage(appIcon);
             } catch (UnsupportedOperationException e) {
                 // do nothing
             }
@@ -65,6 +97,7 @@ public class MainForm extends JFrame {
                         "Are you sure you want to exit",
                         "Exit", JOptionPane.YES_NO_OPTION);
                 if (ifClickedYes(option)) {
+                    onShutdown();
                     MainForm.this.dispose();
                 }
             }
@@ -73,7 +106,7 @@ public class MainForm extends JFrame {
 
 
     private void setBackground() {
-        getContentPane().setBackground(Utilities.PRIMARY_COLOR);
+        getContentPane().setBackground(Theme.BACKGROUND_COLOR);
     }
 
 
@@ -86,16 +119,9 @@ public class MainForm extends JFrame {
     }
 
 
-    public void showHl7Viewer() {
-        final JPanel parserPanel =  (new HL7ParseViewer().createPanel());
-        //final var TablePanel = new HL7TableViewer();
-        panelRefresher(parserPanel);
-
-    }
-
-
     //removes panels and adds new panels
     private void panelRefresher(JPanel mainPanel) {
+        getContentPane().setBackground(Theme.BACKGROUND_COLOR);
         contentPanel.removeAll();
         contentPanel.add(mainPanel, BorderLayout.CENTER);
         contentPanel.revalidate();
@@ -103,8 +129,10 @@ public class MainForm extends JFrame {
     }
 
 
-    private static boolean isMacOS() {
-        return System.getProperty("os.name").toLowerCase().contains("mac");
+    private void onShutdown() {
+        config.set(ConfigKey.SCREEN_WIDTH,  getWidth());
+        config.set(ConfigKey.SCREEN_HEIGHT, getHeight());
+        config.save();
     }
 
 

@@ -1,23 +1,39 @@
-package hl7Viewer.nonGui.parser;
+package hl7Viewer.nonGui.hl7Parser;
 
+
+import hl7Viewer.nonGui.config.IniConfig;
+import hl7Viewer.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import static hl7Viewer.nonGui.parser.HL7Message.NORMAL_ENCODING;
+import static hl7Viewer.nonGui.config.ConfigKey.IGNORE_MSH_CHECK;
+import static hl7Viewer.nonGui.hl7Parser.HL7Message.NORMAL_ENCODING;
 
 public class BasicMessageParser implements IHL7Parser {
+    private final IniConfig config;
+
+    public BasicMessageParser(final IniConfig config) {
+        this.config = config;
+    }
+
     @Override
     public HL7Message parse(String message, HL7Message hl7Msg) throws IllegalArgumentException, NullPointerException {
         java.util.Objects.requireNonNull(message, "Message cannot be null.");
         java.util.Objects.requireNonNull(hl7Msg, "HL7 message Object cannot be null");
 
         message = message.trim();
-        isValidHl7Message(message);
+
+
+        Pair<Boolean, String> validPair =
+                HL7Validator.validateStructure(message, config.get(IGNORE_MSH_CHECK, false));
+        if (!validPair.first())
+            throw new IllegalArgumentException(validPair.second());
+
         message = HL7Message.sanitizeEnterChar(message);
 
-        hl7Msg.setSegments(new ArrayList<>());
+        hl7Msg.setItems(new ArrayList<>());
         final var segments = message.split("\r");
         final char fieldSeparator   = segments[0].charAt(3);
         char componentSeparator     = NORMAL_ENCODING.charAt(1);
@@ -66,16 +82,16 @@ public class BasicMessageParser implements IHL7Parser {
                                     component.split(Pattern.quote(String.valueOf(subcomponentSeparator))))
                                 .map(String::toUpperCase)
                                 .map(String::trim)
-                                .forEach(hl7Comp.getSubcomponentList()::add);
+                                .forEach(hl7Comp.getItems()::add);
 
-                        hl7Repetition.addComponent(hl7Comp);
+                        hl7Repetition.add(hl7Comp);
                     }
-                    hl7field.addRepetition(hl7Repetition);
+                    hl7field.add(hl7Repetition);
                 }
-                hl7Seg.addField(hl7field);
+                hl7Seg.add(hl7field);
                 fieldIndex++;
             }
-            hl7Msg.addSegment(hl7Seg);
+            hl7Msg.add(hl7Seg);
         }
         return hl7Msg;
     }
@@ -107,32 +123,10 @@ public class BasicMessageParser implements IHL7Parser {
         final var hl7Repetition = new HL7Repetition(new ArrayList<>());
         final var component = new HL7Component(new ArrayList<>());
 
-        component.getSubcomponentList().add(field);
+        component.getItems().add(field);
 
-        hl7Repetition.addComponent(component);
-        hl7field.addRepetition(hl7Repetition);
-        hl7Seg.addField(hl7field);
-    }
-
-    private static void isValidHl7Message(final String message)  {
-        var isValid = false;
-        String errorMsg = "Invalid Message: ";
-
-        if (message.isEmpty())
-            errorMsg += "Message cannot be empty";
-
-        else if((message.length() < 4))
-            errorMsg += "Message length is too short";
-
-        else if (!message.substring(0,3).toUpperCase().contains("MSH"))
-            errorMsg += "Message doesn't contain MSH as first segment";
-
-        else {
-            isValid  = true;
-            errorMsg = "";
-        }
-
-        if (!isValid)
-            throw new IllegalArgumentException(errorMsg);
+        hl7Repetition.add(component);
+        hl7field.add(hl7Repetition);
+        hl7Seg.add(hl7field);
     }
 }
