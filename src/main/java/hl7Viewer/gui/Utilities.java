@@ -15,7 +15,7 @@ public class Utilities {
     //preconfigured Title border, just need panel obj and Title name
     public static void setTitledBorder(JComponent panel, String titleText) {
         TitledBorder border = BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Theme.SECONDARY_COLOR, 1),
+                BorderFactory.createLineBorder(Theme.CONTROL_COLOR, 1),
                 titleText,
                 TitledBorder.LEFT,
                 TitledBorder.TOP,
@@ -23,13 +23,13 @@ public class Utilities {
                 Theme.TEXT_COLOR
         );
         panel.setBorder(border);
-        panel.setBackground(Theme.PRIMARY_COLOR);
+        panel.setBackground(Theme.BACKGROUND_COLOR);
         panel.setOpaque(true);
     }
 
     //used to set the background and text color for any panel jtext obj
     public static void setPanelColors(JComponent component) {
-        component.setBackground(Theme.PRIMARY_COLOR);
+        component.setBackground(Theme.BACKGROUND_COLOR);
         component.setOpaque(true);
         component.setForeground(Theme.TEXT_COLOR);
     }
@@ -60,7 +60,7 @@ public class Utilities {
         inputField.setLineWrap(true);
         inputField.setWrapStyleWord(true);
         inputField.setOpaque(isOpaque);
-        inputField.setBackground(isTransparentBackground ? Theme.TRANSPARENT_COLOR : Theme.PRIMARY_COLOR);
+        inputField.setBackground(isTransparentBackground ? Theme.TRANSPARENT_COLOR : Theme.BACKGROUND_COLOR);
         inputField.setForeground(Theme.TEXT_COLOR);
         inputField.setCaretColor(Theme.TEXT_COLOR);
         inputField.setFont(new Font("Monospaced", Font.PLAIN, 12));

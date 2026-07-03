@@ -6,7 +6,7 @@ public class MenuBar extends JMenuBar {
 
     public MenuBar() {
         Utilities.setPanelColors(this);
-        this.setBorder(BorderFactory.createLineBorder(Theme.SECONDARY_COLOR, 2));
+        this.setBorder(BorderFactory.createLineBorder(Theme.CONTROL_COLOR, 2));
     }
 
     public void createMenuWithItem(String menuName, String itemName, Runnable action) {

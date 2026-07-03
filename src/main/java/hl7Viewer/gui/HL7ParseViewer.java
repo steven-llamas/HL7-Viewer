@@ -19,6 +19,7 @@ public class HL7ParseViewer implements IView {
         this.hl7TableViewer = new HL7TableViewer(config);
     }
 
+
     @Override
     public JPanel createPanel() {
         final var outerPanel = createAndSetHl7ViewerPanel();
@@ -116,7 +117,7 @@ public class HL7ParseViewer implements IView {
 
         messageTextBox.setBorder(
                 BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(Theme.SECONDARY_COLOR, 2),
+                        BorderFactory.createLineBorder(Theme.CONTROL_COLOR, 2),
                         Utilities.addPadding(10, 10, 10, 10)
         ));
 
