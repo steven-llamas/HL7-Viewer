@@ -124,5 +124,16 @@ class AbstractFileReaderWriterTest {
 
             assertFalse(rw.write(List.of("line1"), false));
         }
+
+        @Test
+        @DisplayName("should write each item on its own line")
+        void write_WritesEachItemOnSeparateLine(@TempDir Path dir) throws IOException {
+            final var file = dir.resolve("test.ini");
+            final var rw = new ConcreteReaderWriter(file.toString());
+
+            rw.write(List.of("line1", "line2", "line3"), false);
+
+            assertEquals(List.of("line1", "line2", "line3"), Files.readAllLines(file));
+        }
     }
 }
