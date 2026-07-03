@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>hl7</groupId>
     <artifactId>Hl7parser</artifactId>
-    <version>0.4</version>
+    <version>1.0.4</version>
 
     <properties>
         <maven.compiler.source>24</maven.compiler.source>
