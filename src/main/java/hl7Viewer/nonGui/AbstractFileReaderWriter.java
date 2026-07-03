@@ -103,12 +103,4 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
     protected String onWriteLine(final String line) {
         return line;
     }
-
-//    protected String getFileName() {
-//        return fileName;
-//    }
-//
-//    protected void setFileName(String fileName) {
-//        this.fileName = fileName;
-//    }
 }

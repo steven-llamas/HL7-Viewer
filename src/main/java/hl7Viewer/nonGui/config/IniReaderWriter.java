@@ -1,5 +1,6 @@
 package hl7Viewer.nonGui.config;
 
+import hl7Viewer.AppInfo;
 import hl7Viewer.nonGui.AbstractFileReaderWriter;
 
 import java.util.LinkedHashMap;
@@ -46,7 +47,7 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
      *
      */
     public IniReaderWriter() {
-        super("config.ini");
+        super(AppInfo.CONFIG_PATH);
     }
 
     /**
