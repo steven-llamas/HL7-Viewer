@@ -1,6 +1,8 @@
 package hl7Viewer;
 
 import hl7Viewer.gui.MainForm;
+import hl7Viewer.nonGui.config.IniConfig;
+import hl7Viewer.nonGui.config.IniReaderWriter;
 
 import javax.swing.SwingUtilities;
 
@@ -14,11 +16,12 @@ public class Main {
         }
     }
 
-//   Runs the GUI in Event Dispatch Thread (EDT)
     private static void runSwingGuiOnEdt() {
-        final var program = new MainForm();
-        SwingUtilities.invokeLater(
-                () ->  program.setVisible(true)
-        );
+        final var rw = new IniReaderWriter();
+        rw.read();
+
+        final var config = new IniConfig(rw);
+        final var program = new MainForm(config);
+        SwingUtilities.invokeLater(() -> program.setVisible(true));
     }
 }

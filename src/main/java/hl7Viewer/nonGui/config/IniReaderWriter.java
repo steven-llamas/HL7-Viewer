@@ -45,7 +45,7 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
      * its parent class filepath as the default {@code config.ini} for later methods to use.
      *
      */
-    IniReaderWriter() {
+    public IniReaderWriter() {
         super("config.ini");
     }
 
@@ -66,10 +66,12 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
         return outConfigMap;
     }
 
+
     /** Clears all parsed entries from the map. */
     public void clearOutConfigMap() {
         outConfigMap.clear();
     }
+
 
     /** Returns {@code true} if the map contains at least one parsed entry. */
     public boolean outConfigMapHasItems() {
@@ -98,6 +100,7 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
 
             return;
         }
+
 
         final var token = String.valueOf(IniTokens.PAIR.value);
         if(line.contains(token)) {

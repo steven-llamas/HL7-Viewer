@@ -1,6 +1,9 @@
 package hl7Viewer.gui;
 
 
+import hl7Viewer.nonGui.config.ConfigKey;
+import hl7Viewer.nonGui.config.IniConfig;
+import hl7Viewer.nonGui.hl7Parser.BasicMessageParser;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -8,17 +11,24 @@ import java.awt.event.WindowEvent;
 
 
 public class MainForm extends JFrame {
+
     private final JPanel contentPanel;
 
-    public MainForm() {
+    private final IniConfig config;
+
+    public MainForm(final IniConfig config) {
+        this.config = config;
 
         setTitle("HL7 Viewer");
-        setSize(1000, 600);
+        int screenWidth  = config.getInt(ConfigKey.SCREEN_WIDTH,  1000);
+        int screenHeight = config.getInt(ConfigKey.SCREEN_HEIGHT, 600);
+
+        setSize(screenWidth, screenHeight);
         setAppOnCenterOfScreen();
         setImageIcon();
         setWarningOnExit();
 
-        if (isMacOS()) {
+        if (Utilities.IS_MAC_OS) {
             System.setProperty("apple.awt.application.name", "HL7 Viewer");
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
@@ -35,6 +45,15 @@ public class MainForm extends JFrame {
     }
 
 
+    public void showHl7Viewer() {
+        final JPanel parserPanel =
+                new HL7ParseViewer(new BasicMessageParser(config), new HL7TableViewer(config))
+                .createPanel();
+        panelRefresher(parserPanel);
+
+    }
+
+
     private void setAppOnCenterOfScreen() {
         setLocationRelativeTo(null);
     }
@@ -46,7 +65,7 @@ public class MainForm extends JFrame {
         final var image = new ImageIcon(iconURL);
         setIconImage(image.getImage());
 
-        if (isMacOS()){
+        if (Utilities.IS_MAC_OS){
             try {
                 Taskbar.getTaskbar().setIconImage(image.getImage());
             } catch (UnsupportedOperationException e) {
@@ -86,25 +105,12 @@ public class MainForm extends JFrame {
     }
 
 
-    public void showHl7Viewer() {
-        final JPanel parserPanel =  (new HL7ParseViewer().createPanel());
-        //final var TablePanel = new HL7TableViewer();
-        panelRefresher(parserPanel);
-
-    }
-
-
     //removes panels and adds new panels
     private void panelRefresher(JPanel mainPanel) {
         contentPanel.removeAll();
         contentPanel.add(mainPanel, BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
-    }
-
-
-    private static boolean isMacOS() {
-        return System.getProperty("os.name").toLowerCase().contains("mac");
     }
 
 
