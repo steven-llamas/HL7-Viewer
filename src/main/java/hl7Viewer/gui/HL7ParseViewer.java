@@ -2,14 +2,20 @@ package hl7Viewer.gui;
 
 import hl7Viewer.nonGui.hl7Parser.*;
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class HL7ParseViewer {
-    private HL7TableViewer hl7TableViewer;
+    private final IHL7Parser parser;
+
+    private final HL7TableViewer hl7TableViewer;
+
+    public HL7ParseViewer(final IHL7Parser parser,
+                          final  HL7TableViewer hl7TableViewer) {
+        this.parser = parser;
+        this.hl7TableViewer = hl7TableViewer;
+    }
 
 
     public JPanel createPanel() {
@@ -50,15 +56,16 @@ public class HL7ParseViewer {
 
 
     private static boolean pressedCtrlAndEnter(KeyEvent e) {
-        return e.isControlDown() && e.getKeyCode() == KeyEvent.VK_ENTER;
+        final var buttonHeld = Utilities.IS_MAC_OS
+                ? e.isMetaDown()
+                : e.isControlDown();
+        return buttonHeld && e.getKeyCode() == KeyEvent.VK_ENTER;
     }
 
 
     private JPanel createAndSetInputAndOutputPanel() {
         final var inputAndOutputPanel = new JPanel(new GridLayout(1, 2));
         inputAndOutputPanel.setOpaque(false);
-
-        hl7TableViewer = new HL7TableViewer();
         final var messagePanel = createMessageInputPanel();
 
         inputAndOutputPanel.add(messagePanel);
@@ -83,7 +90,7 @@ public class HL7ParseViewer {
 
         final var topBtns = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
         topBtns.setOpaque(false);
-        topBtns.add(new Button("Parse HL7", () -> handleMessage(messageTextBox)));
+        topBtns.add(new Button("Parse HL7", () -> parseAndDisplay(messageTextBox.getText())));
         topBtns.add(new Button("Copy Table", hl7TableViewer::copyTableToClipboard));
         btnPanel.add(topBtns);
 
@@ -120,7 +127,7 @@ public class HL7ParseViewer {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (pressedCtrlAndEnter(e)) {
-                    handleMessage(messageTextBox);
+                    parseAndDisplay(messageTextBox.getText());
                     e.consume();
                 }
             }
@@ -128,171 +135,13 @@ public class HL7ParseViewer {
     }
 
 
-    private void handleMessage(JTextArea textBox) {
-        parseAndDisplay(textBox.getText());
-    }
-
-
-    private void parseAndDisplay(String input) {
+    private void parseAndDisplay(final String input) {
         try {
-            IHL7Parser parser = new BasicMessageParser();
-            var hl7Message = new HL7Message();
-            hl7Message = parser.parse(input, hl7Message);
+            hl7TableViewer.displayMessage(parser.parse(input, new HL7Message()));
 
-            hl7TableViewer.displayMessage(hl7Message);
         } catch (IllegalArgumentException | NullPointerException ex) {
             showErrorMessage(ex.getMessage());
-            // used for console bugging
             ex.printStackTrace();
         }
-    }
-}
-
-
-class HL7TableViewer extends JPanel {
-    private JTable jTable;
-    private DefaultTableModel hl7TableData;
-
-
-    public HL7TableViewer() {
-        setLayout(new BorderLayout());
-        setOpaque(false);
-        initializeTable();
-    }
-
-
-    public void displayMessage(final HL7Message hl7Message) {
-        hl7TableData.setRowCount(0);
-
-        if (!displayEachRow(hl7Message)) {
-            JOptionPane.showMessageDialog(this,
-                    "Failed to display HL7 fields.",
-                    "Parsing Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-
-    public void clearTable() {
-        if (hl7TableData.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Table is already Empty.");
-            return;
-        }
-        hl7TableData.setRowCount(0);
-    }
-
-
-    public void copyTableToClipboard() {
-        if (jTable.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(
-                    this, "Table is empty. Please press after parsing message");
-            return;
-        }
-
-        final var contents = new StringBuilder();
-
-        for (var i = 0; i < jTable.getColumnCount(); ++i)
-            contents.append(jTable.getColumnName(i)).append("\t");
-
-        contents.append("\n");
-
-        for (var i = 0; i < jTable.getRowCount(); ++i) {
-            for (var j = 0; j < jTable.getColumnCount(); ++j) {
-                final var value = jTable.getValueAt(i, j)
-                        .toString()
-                        .replaceAll("\\<[^>]*>", "");
-
-                contents.append(value).append("\t");
-            }
-            contents.append("\n");
-        }
-
-        Toolkit.getDefaultToolkit()
-                .getSystemClipboard()
-                .setContents(
-                        new java.awt.datatransfer.StringSelection(
-                                contents.toString()), null);
-    }
-
-
-    private void initializeTable() {
-        final String[] columnNames = {"Index", "Value"};
-
-        hl7TableData = new DefaultTableModel(columnNames, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        jTable = new JTable(hl7TableData);
-        jTable.getColumnModel().getColumn(1).setCellRenderer(new TextRenderer());
-        jTable.setOpaque(false);
-        jTable.setBackground(Utilities.TRANSPARENT_COLOR);
-        jTable.setForeground(Utilities.TEXT_COLOR);
-        jTable.setGridColor(Utilities.TERCIARY_COLOR);
-        jTable.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        jTable.setRowHeight(22);
-        jTable.setFillsViewportHeight(true);
-        setupHeaderRenderer(jTable);
-
-        final var header = jTable.getTableHeader();
-        header.setReorderingAllowed(false);
-        header.setResizingAllowed(false);
-        header.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Utilities.TERCIARY_COLOR));
-        Utilities.setPanelColors(header);
-
-        add(getJScrollPane(), BorderLayout.CENTER);
-    }
-
-
-    private JScrollPane getJScrollPane() {
-        final var scrollPane = new JScrollPane(jTable);
-        scrollPane.setOpaque(false);
-        scrollPane.setBackground(Utilities.TRANSPARENT_COLOR);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.getViewport().setBackground(Utilities.TRANSPARENT_COLOR);
-        scrollPane.setViewportBorder(null);
-        return scrollPane;
-    }
-
-
-    private boolean displayEachRow(final HL7Message hl7Message) {
-        for (final var row : hl7Message.flatten()) {
-            final String plainIndex = row.first();
-            final int dash = plainIndex.indexOf('-');
-            final String htmlIndex =
-                    "<html><b>" +
-                    plainIndex.substring(0, dash) +
-                    "</b>" +
-                    plainIndex.substring(dash) +
-                    "</html>";
-
-            hl7TableData.addRow(new Object[]{htmlIndex, row.second()});
-        }
-        return hl7TableData.getRowCount() != 0;
-    }
-
-
-    private void setupHeaderRenderer(JTable table) {
-        table.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus,
-                                                           int row, int column) {
-                JLabel label = (JLabel) super.getTableCellRendererComponent(
-                        table, value, isSelected, hasFocus, row, column);
-                Utilities.setPanelColors(label);
-                label.setHorizontalAlignment(SwingConstants.CENTER);
-
-                if (column < table.getColumnCount() - 1)
-                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Utilities.TERCIARY_COLOR));
-                else
-                    label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-
-                return label;
-            }
-        });
     }
 }

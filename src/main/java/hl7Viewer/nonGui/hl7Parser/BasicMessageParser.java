@@ -1,15 +1,23 @@
 package hl7Viewer.nonGui.hl7Parser;
 
 
+import hl7Viewer.nonGui.config.IniConfig;
 import hl7Viewer.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import static hl7Viewer.nonGui.config.ConfigKey.IGNORE_MSH_CHECK;
 import static hl7Viewer.nonGui.hl7Parser.HL7Message.NORMAL_ENCODING;
 
 public class BasicMessageParser implements IHL7Parser {
+    private final IniConfig config;
+
+    public BasicMessageParser(final IniConfig config) {
+        this.config = config;
+    }
+
     @Override
     public HL7Message parse(String message, HL7Message hl7Msg) throws IllegalArgumentException, NullPointerException {
         java.util.Objects.requireNonNull(message, "Message cannot be null.");
@@ -18,7 +26,8 @@ public class BasicMessageParser implements IHL7Parser {
         message = message.trim();
 
 
-        Pair<Boolean, String> validPair = HL7Validator.validateStructure(message);
+        Pair<Boolean, String> validPair =
+                HL7Validator.validateStructure(message, config.getBoolean(IGNORE_MSH_CHECK, false));
         if (!validPair.first())
             throw new IllegalArgumentException(validPair.second());
 

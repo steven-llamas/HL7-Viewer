@@ -1,5 +1,7 @@
 package hl7Viewer.nonGui.hl7Parser;
 
+import hl7Viewer.nonGui.config.IniConfig;
+import hl7Viewer.nonGui.config.IniReaderWriter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,10 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class BasicMessageParserTest {
     private BasicMessageParser parser;
 
+    private static BasicMessageParser defaultParser() {
+        return new BasicMessageParser(new IniConfig(new IniReaderWriter()));
+    }
 
     @BeforeEach
     void setUp() {
-        parser = new BasicMessageParser();
+        parser = defaultParser();
     }
 
 
@@ -234,7 +239,7 @@ class BasicMessageParserTest {
 
         @BeforeEach
         void setUp() {
-            parser = new BasicMessageParser();
+            parser = defaultParser();
             String msgWCustomEnc = """
                     MSH!:*\\#!SENDING_APP!SENDING_FAC!REC_APP!REC_FAC!202310271030!!ADT:A01!12345!P!2.5
                     EVN!!202310271030

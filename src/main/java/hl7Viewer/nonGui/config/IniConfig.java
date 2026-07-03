@@ -16,16 +16,23 @@ public class IniConfig {
     private final ArrayList<String> outputList = new ArrayList<>();
 
 
-
+    /**
+     * Constructs a new {@link  IniConfig}
+     *
+     * @param readerWriter {@link IniReaderWriter} object that is then assigned to {@link #readerWriter}.
+     *          If object has items in its output map we then we construct new map and copy them over,
+     *          otherwise the map is empty. then we
+     *
+     */
     public IniConfig(final IniReaderWriter readerWriter) {
         this.readerWriter = readerWriter;
 
-        configMap = (readerWriter.outConfigMapHasItems())
-                ? new LinkedHashMap<>(readerWriter.getOutConfigMap())
-                : new LinkedHashMap<>();
-
-        if(readerWriter.outConfigMapHasItems())
+        if (readerWriter.outConfigMapHasItems()) {
+            configMap = new LinkedHashMap<>(readerWriter.getOutConfigMap());
             readerWriter.clearOutConfigMap();
+        } else {
+            configMap = new LinkedHashMap<>();
+        }
     }
 
 
@@ -34,9 +41,34 @@ public class IniConfig {
         return section + IniReaderWriter.IniTokens.KEY_SEPARATOR.value + key;
     }
 
+
+    /** Returns the boolean value for the given key, or {@code defaultValue} if absent. */
+    public boolean getBoolean(final ConfigKey key, final boolean defaultValue) {
+        return getBoolean(key.section, key.key, defaultValue);
+    }
+
+
+    /** Returns the int value for the given key, or {@code defaultValue} if absent or unparseable. */
+    public int getInt(final ConfigKey key, final int defaultValue) {
+        return getInt(key.section, key.key, defaultValue);
+    }
+
+
+    /** Returns the string value for the given key, or {@code defaultValue} if absent. */
+    public String getString(final ConfigKey key, final String defaultValue) {
+        return getString(key.section, key.key, defaultValue);
+    }
+
+
+    /** Sets a value in memory. Changes are not persisted until {@link #save()} is called. */
+    public void set(final ConfigKey key, final Object newValue) {
+        set(key.section, key.key, newValue);
+    }
+
+
     /** Returns the boolean value for the given section/key,
      *  or {@code defaultValue} if absent. */
-    public boolean getBoolean(final String section,
+    private boolean getBoolean(final String section,
                               final String key,
                               final boolean defaultValue) {
         final var value = configMap.get(makeMapKey(section, key));
@@ -45,8 +77,9 @@ public class IniConfig {
                 : Boolean.parseBoolean(value);
     }
 
+
     /** Returns the int value for the given section/key, or {@code defaultValue} if absent or unparseable. */
-    public int getInt(final String section, final String key, final int defaultValue) {
+    private int getInt(final String section, final String key, final int defaultValue) {
         final var value = configMap.get(makeMapKey(section, key));
         if (value == null || value.isEmpty())
             return defaultValue;
@@ -59,7 +92,7 @@ public class IniConfig {
     }
 
     /** Returns the string value for the given section/key, or {@code defaultValue} if absent. */
-    public String getString(final String section, final String key, final String defaultValue) {
+    private String getString(final String section, final String key, final String defaultValue) {
         final var value = configMap.get(makeMapKey(section, key));
         return (value == null || value.isEmpty())
                 ? defaultValue
@@ -68,19 +101,20 @@ public class IniConfig {
 
 
     /** Sets a value in memory. Changes are not persisted until {@link #save()} is called. */
-    public void set(final String section, final String key, final Object newValue) {
+    private void set(final String section, final String key, final Object newValue) {
         final var mapKey = makeMapKey(section, key);
         configMap.put(mapKey, (newValue != null) ? String.valueOf(newValue) : "");
     }
 
 
-    /** Writes the current config back to the INI file, as long as {@link #configMap} is not empty */
-    public void save() {
+    /** Writes the current config back to the INI file, as long as {@link #configMap} is not empty
+     * @return bool depending on whether {@code IniReaderWriter.write()} is successful*/
+    public boolean save() {
         if(configMap.isEmpty())
-            return;
+            return true;
 
         buildOutputList();
-        readerWriter.write(outputList, false);
+        return readerWriter.write(outputList, false);
     }
 
     // formats configMap into INI lines grouped by section, with a blank line between sections
