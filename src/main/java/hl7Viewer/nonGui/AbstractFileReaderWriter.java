@@ -51,7 +51,7 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
 
             success = true;
         } catch (IOException e) {
-            System.out.println("Error reading file." + e.getMessage());
+            onError("Error reading file: " + e.getMessage());
             return success;
         }
 
@@ -80,20 +80,33 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
                 final String writeLine = onWriteLine(item);
                 bufferedWriter.write(writeLine);
                 bufferedWriter.newLine();
-                System.out.println("Wrote:\t" + writeLine + "\t to " + filePath);
             }
 
             success = true;
         } catch (IOException e) {
-            System.out.println("Error writing file." + e.getMessage());
+            onError("Error writing file: " + e.getMessage());
             return success;
         }
 
         return success;
     }
 
-    /** Called for each non-empty trimmed line during {@link #read}. */
-    protected abstract void onReadLine(final String line);
+
+    /**
+     * Called when a read or write operation fails. Defaults to logging via {@link Logger}.
+     * Subclasses that cannot safely call {@link Logger}.
+     *
+     * @param message error description
+     */
+    protected void onError(final String message) {
+
+        try {
+            Logger.getInstance().logError(message);
+        } catch (IllegalStateException e) {
+            System.err.println(message);
+        }
+    }
+
 
     /** Called for each item just before it is written during {@link #write}.
      *  Child classes can override to add functionality if needed
@@ -103,4 +116,8 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
     protected String onWriteLine(final String line) {
         return line;
     }
+
+
+    /** Called for each non-empty trimmed line during {@link #read}. */
+    protected abstract void onReadLine(final String line);
 }
