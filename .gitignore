@@ -35,3 +35,4 @@ bin/
 *.app
 **/src/java/hl7Viewer/gui/HL7MessageBuilder.java
 /config.ini
+/log.txt
