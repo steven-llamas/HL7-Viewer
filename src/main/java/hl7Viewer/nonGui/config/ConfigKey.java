@@ -17,7 +17,10 @@ public enum ConfigKey {
     BACKGROUND_COLOR("Theme", "primary_color",   "Background color for panels and dialogs."),
     CONTROL_COLOR  ("Theme", "secondary_color", "Border and button background color."),
     GRID_COLOR     ("Theme", "tertiary_color",  "Grid and separator color."),
-    TEXT_COLOR     ("Theme", "text_color",      "Foreground text and accent color.");
+    TEXT_COLOR     ("Theme", "text_color",      "Foreground text and accent color."),
+
+    LOG_LEVEL      ("Logging", "log_level",    "Minimum log level threshold for output (TRACE, DEBUG, ERROR, FATAL).");
+
 
 
     public final String section;
