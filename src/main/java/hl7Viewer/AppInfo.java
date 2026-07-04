@@ -12,6 +12,7 @@ public final class AppInfo {
             System.getProperty("os.name").toLowerCase().contains("mac");
 
     public static final String CONFIG_PATH = resolvePath("config.ini");
+    public static final String LOG_PATH = resolvePath("log.txt");
 
     public static String resolvePath(final String filename) {
         if (!isJar())
