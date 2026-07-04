@@ -1,6 +1,7 @@
 package hl7Viewer.gui;
 
 import hl7Viewer.AppInfo;
+import hl7Viewer.nonGui.Logger;
 import hl7Viewer.nonGui.config.IniConfig;
 import hl7Viewer.nonGui.hl7Parser.*;
 import javax.swing.*;
@@ -40,7 +41,7 @@ public class HL7ParseViewer implements IView {
     }
 
 
-    private static void showErrorMessage(String exceptionMessage) {
+    private static void showErrorMessage(final String exceptionMessage) {
         SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
                 null,
                 "Failed to parse HL7 message:\n" + exceptionMessage,
@@ -140,11 +141,12 @@ public class HL7ParseViewer implements IView {
 
     private void parseAndDisplay(final String input) {
         try {
+            Logger.getInstance().logDebug("Parse triggered, input length: " + input.length());
             hl7TableViewer.displayMessage(parser.parse(input, new HL7Message()));
 
         } catch (IllegalArgumentException | NullPointerException ex) {
             showErrorMessage(ex.getMessage());
-            ex.printStackTrace();
+            Logger.getInstance().logError(ex.getMessage());
         }
     }
 }

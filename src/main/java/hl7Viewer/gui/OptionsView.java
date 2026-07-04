@@ -1,5 +1,6 @@
 package hl7Viewer.gui;
 
+import hl7Viewer.nonGui.Logger;
 import hl7Viewer.nonGui.config.ConfigKey;
 import hl7Viewer.nonGui.config.IniConfig;
 
@@ -91,6 +92,7 @@ public class OptionsView implements IView {
             !Theme.isValidHex(secondaryHex) ||
             !Theme.isValidHex(tertiaryHex)  ||
             !Theme.isValidHex(textHex)) {
+            Logger.getInstance().logError("Invalid hex color entered");
             JOptionPane.showMessageDialog(null,
                     "Invalid hex color. Expected format: #RRGGBB",
                     "Validation Error", JOptionPane.ERROR_MESSAGE);
@@ -121,6 +123,7 @@ public class OptionsView implements IView {
         Theme.GRID_COLOR  = tertiaryColor;
         Theme.TEXT_COLOR      = textColor;
 
+        Logger.getInstance().logDebug("Settings saved");
         JOptionPane.showMessageDialog(null,
                 "Settings saved.",
                 "Saved", JOptionPane.INFORMATION_MESSAGE);

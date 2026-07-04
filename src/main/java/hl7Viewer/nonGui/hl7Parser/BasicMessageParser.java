@@ -1,6 +1,7 @@
 package hl7Viewer.nonGui.hl7Parser;
 
 
+import hl7Viewer.nonGui.Logger;
 import hl7Viewer.nonGui.config.IniConfig;
 import hl7Viewer.utils.Pair;
 
@@ -28,13 +29,17 @@ public class BasicMessageParser implements IHL7Parser {
 
         Pair<Boolean, String> validPair =
                 HL7Validator.validateStructure(message, config.get(IGNORE_MSH_CHECK, false));
-        if (!validPair.first())
-            throw new IllegalArgumentException(validPair.second());
+        if (!validPair.first()) {
+            final var errorMsg = validPair.second();
+            Logger.getInstance().logError(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
+        }
 
         message = HL7Message.sanitizeEnterChar(message);
 
         hl7Msg.setItems(new ArrayList<>());
         final var segments = message.split("\r");
+        Logger.getInstance().logDebug("Parsing message, segments: " + segments.length);
         final char fieldSeparator   = segments[0].charAt(3);
         char componentSeparator     = NORMAL_ENCODING.charAt(1);
         char repSeparator           = NORMAL_ENCODING.charAt(2);
@@ -45,6 +50,7 @@ public class BasicMessageParser implements IHL7Parser {
                     Pattern.quote(String.valueOf(fieldSeparator)));
 
             final var segHeader = fields[0].trim().toUpperCase();
+            Logger.getInstance().logTrace("Processing segment: " + segHeader);
             final var hl7Seg = new HL7Segment(segHeader, new ArrayList<>());
             var fieldIndex = 0;
 
@@ -93,6 +99,7 @@ public class BasicMessageParser implements IHL7Parser {
             }
             hl7Msg.add(hl7Seg);
         }
+        Logger.getInstance().logDebug("Parse complete, segment count: " + hl7Msg.getItems().size());
         return hl7Msg;
     }
 

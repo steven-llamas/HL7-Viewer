@@ -2,6 +2,7 @@ package hl7Viewer.gui;
 
 
 import hl7Viewer.AppInfo;
+import hl7Viewer.nonGui.Logger;
 import hl7Viewer.nonGui.config.ConfigKey;
 import hl7Viewer.nonGui.config.IniConfig;
 import hl7Viewer.nonGui.hl7Parser.BasicMessageParser;
@@ -132,6 +133,7 @@ public class MainForm extends JFrame {
     private void onShutdown() {
         config.set(ConfigKey.SCREEN_WIDTH,  getWidth());
         config.set(ConfigKey.SCREEN_HEIGHT, getHeight());
+        Logger.getInstance().logDebug("Saving config on exit, size: " + getWidth() + "x" + getHeight());
         config.save();
     }
 

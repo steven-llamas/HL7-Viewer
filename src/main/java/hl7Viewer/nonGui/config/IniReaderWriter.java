@@ -2,6 +2,7 @@ package hl7Viewer.nonGui.config;
 
 import hl7Viewer.AppInfo;
 import hl7Viewer.nonGui.AbstractFileReaderWriter;
+import hl7Viewer.nonGui.Logger;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,7 +32,6 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
         IniTokens(char value) {
             this.value = value;
         }
-
     }
 
 
@@ -112,6 +112,13 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
             if (!key.isEmpty() && !value.isEmpty()) {
                 final var configKey = IniConfig.makeMapKey(sectionHeader, key);
                 outConfigMap.putIfAbsent(configKey, value);
+
+                final var msg = "Config loaded: " + configKey + " = " + value;
+                try {
+                    Logger.getInstance().logTrace(msg);
+                } catch (IllegalStateException ignored) {
+                    System.out.println("Config loaded: " + configKey + " = " + value);
+                }
             }
         }
     }
