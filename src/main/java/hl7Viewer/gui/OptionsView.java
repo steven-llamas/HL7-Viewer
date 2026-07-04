@@ -1,5 +1,6 @@
 package hl7Viewer.gui;
 
+import hl7Viewer.AppInfo;
 import hl7Viewer.nonGui.Logger;
 import hl7Viewer.nonGui.config.ConfigKey;
 import hl7Viewer.nonGui.config.IniConfig;
@@ -15,15 +16,17 @@ public class OptionsView implements IView {
     private Color   secondaryColor;
     private Color   tertiaryColor;
     private Color   textColor;
+    private Logger.LogLevel logLevel;
 
     private final IniConfig config;
 
-    private JCheckBox  boldHL7IndexBox;
-    private JCheckBox  ignoreMshCheckBox;
-    private JTextField primaryColorField;
-    private JTextField secondaryColorField;
-    private JTextField tertiaryColorField;
-    private JTextField textColorField;
+    private JCheckBox                    boldHL7IndexBox;
+    private JCheckBox                    ignoreMshCheckBox;
+    private JTextField                   primaryColorField;
+    private JTextField                   secondaryColorField;
+    private JTextField                   tertiaryColorField;
+    private JTextField                   textColorField;
+    private JComboBox<Logger.LogLevel>   logLevelBox;
 
 
     public OptionsView(final IniConfig config) {
@@ -39,6 +42,8 @@ public class OptionsView implements IView {
         secondaryColor = config.get(ConfigKey.CONTROL_COLOR,   Theme.CONTROL_COLOR);
         tertiaryColor  = config.get(ConfigKey.GRID_COLOR,      Theme.GRID_COLOR);
         textColor      = config.get(ConfigKey.TEXT_COLOR,       Theme.TEXT_COLOR);
+        logLevel       = Logger.LogLevel.toLogLevel(config.get(ConfigKey.LOG_LEVEL,
+                (!AppInfo.IS_DEBUG) ? Logger.LogLevel.ERROR.level : Logger.LogLevel.TRACE.level));
     }
 
 
@@ -68,6 +73,9 @@ public class OptionsView implements IView {
         secondaryColorField = addTextRow(form, ConfigKey.CONTROL_COLOR, Theme.toHex(secondaryColor));
         tertiaryColorField  = addTextRow(form, ConfigKey.GRID_COLOR,  Theme.toHex(tertiaryColor));
         textColorField      = addTextRow(form, ConfigKey.TEXT_COLOR,       Theme.toHex(textColor));
+
+        addSectionLabel(form, "Logging");
+        logLevelBox = addComboRow(form, ConfigKey.LOG_LEVEL, Logger.LogLevel.values(), logLevel);
 
         return form;
     }
@@ -110,6 +118,7 @@ public class OptionsView implements IView {
         secondaryColor = secondary;
         tertiaryColor  = tertiary;
         textColor      = text;
+        logLevel       = (Logger.LogLevel) logLevelBox.getSelectedItem();
 
         config.set(ConfigKey.BOLD_HL7_INDEX,   boldHL7Index);
         config.set(ConfigKey.IGNORE_MSH_CHECK, ignoreMshCheck);
@@ -117,6 +126,7 @@ public class OptionsView implements IView {
         config.set(ConfigKey.CONTROL_COLOR,  secondaryColor);
         config.set(ConfigKey.GRID_COLOR,   tertiaryColor);
         config.set(ConfigKey.TEXT_COLOR,       textColor);
+        config.set(ConfigKey.LOG_LEVEL,        logLevel.level);
 
         Theme.BACKGROUND_COLOR   = primaryColor;
         Theme.CONTROL_COLOR = secondaryColor;
@@ -138,6 +148,7 @@ public class OptionsView implements IView {
         secondaryColorField.setText(    Theme.toHex(secondaryColor) );
         tertiaryColorField.setText(     Theme.toHex(tertiaryColor)  );
         textColorField.setText(         Theme.toHex(textColor)      );
+        logLevelBox.setSelectedItem(    logLevel                    );
         closeParentWindow();
     }
 
@@ -176,10 +187,40 @@ public class OptionsView implements IView {
     private static JCheckBox addCheckRow(final JPanel form, final ConfigKey key, final boolean value) {
         final var box = new JCheckBox();
         box.setSelected(value);
-        box.setBackground(Theme.BACKGROUND_COLOR);
+        box.setBackground(Theme.CONTROL_COLOR);
+        box.setForeground(Theme.TEXT_COLOR);
         box.setOpaque(true);
         addRow(form, key, box);
         return box;
+    }
+
+
+    private static <T> JComboBox<T> addComboRow(final JPanel form,
+                                                final ConfigKey key,
+                                                final T[] options,
+                                                final T selected) {
+        final var combo = styledComboBox(options, selected);
+        addRow(form, key, combo);
+        return combo;
+    }
+
+
+    private static <T> JComboBox<T> styledComboBox(final T[] options, final T selected) {
+        final var combo = new JComboBox<>(options);
+        combo.setSelectedItem(selected);
+        combo.setBackground(Theme.CONTROL_COLOR);
+        combo.setForeground(Theme.TEXT_COLOR);
+        combo.setBorder(BorderFactory.createLineBorder(Theme.GRID_COLOR, 1));
+        combo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                setBackground(isSelected ? Theme.GRID_COLOR : Theme.CONTROL_COLOR);
+                setForeground(Theme.TEXT_COLOR);
+                return this;
+            }
+        });
+        return combo;
     }
 
 
