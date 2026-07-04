@@ -1,6 +1,8 @@
 package hl7Viewer.nonGui;
 
 
+import hl7Viewer.AppInfo;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -94,7 +96,7 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
 
     /**
      * Called when a read or write operation fails. Defaults to logging via {@link Logger}.
-     * Subclasses that cannot safely call {@link Logger}.
+     * Subclasses that cannot safely call {@link Logger} should override this
      *
      * @param message error description
      */
@@ -103,7 +105,8 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
         try {
             Logger.getInstance().logError(message);
         } catch (IllegalStateException e) {
-            System.err.println(message);
+            if (AppInfo.IS_DEBUG)
+                System.err.println(message);
         }
     }
 

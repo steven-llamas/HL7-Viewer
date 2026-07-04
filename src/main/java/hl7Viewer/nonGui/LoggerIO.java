@@ -21,7 +21,8 @@ public class LoggerIO extends AbstractFileReaderWriter {
 
     @Override
     protected void onError(final String message) {
-        System.err.println(message);
+        if(AppInfo.IS_DEBUG)
+            System.err.println(message);
     }
 
 //    @Override

@@ -117,7 +117,8 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
                 try {
                     Logger.getInstance().logTrace(msg);
                 } catch (IllegalStateException ignored) {
-                    System.out.println("Config loaded: " + configKey + " = " + value);
+                    if (AppInfo.IS_DEBUG)
+                        System.out.println(msg);
                 }
             }
         }

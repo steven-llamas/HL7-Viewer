@@ -8,11 +8,15 @@ public final class AppInfo {
 
     public static final String BUILD_TYPE = isJar() ? "Release" : "Debug";
 
+    public static final boolean IS_DEBUG = !isJar();
+
     public static final boolean IS_MAC_OS =
             System.getProperty("os.name").toLowerCase().contains("mac");
 
     public static final String CONFIG_PATH = resolvePath("config.ini");
+
     public static final String LOG_PATH = resolvePath("log.txt");
+
 
     public static String resolvePath(final String filename) {
         if (!isJar())
@@ -26,6 +30,7 @@ public final class AppInfo {
             return filename;
         }
     }
+
 
     private static boolean isJar() {
         return AppInfo.class.getProtectionDomain()
