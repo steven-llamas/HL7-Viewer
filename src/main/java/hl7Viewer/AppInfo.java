@@ -15,11 +15,11 @@ public final class AppInfo {
 
     public static final String CONFIG_PATH = resolvePath("config.ini");
 
-    public static final String LOG_PATH = resolvePath("log.txt");
+    public static final String LOG_PATH = resolvePath("logs" + File.separator + "log");
 
 
     public static String resolvePath(final String filename) {
-        if (!isJar())
+        if (IS_DEBUG)
             return filename;
 
         try {
@@ -36,6 +36,7 @@ public final class AppInfo {
         return AppInfo.class.getProtectionDomain()
                 .getCodeSource().getLocation().toString().endsWith(".jar");
     }
+
 
     private AppInfo() {}
 }
