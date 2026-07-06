@@ -3,10 +3,14 @@ package hl7Viewer.nonGui;
 
 import hl7Viewer.AppInfo;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -15,7 +19,11 @@ import java.util.List;
  * {@link #onReadLine} and {@link #onWriteLine}.
  */
 public abstract class AbstractFileReaderWriter implements IFileReader, IFileWriter {
-    private String filePath;
+    private Path filepath;
+
+    private boolean isPathExists;
+
+    private boolean isFilePathChanged;
 
 
     /**
@@ -25,7 +33,10 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
      * @param filePath filepath of where the file is located
      */
     public AbstractFileReaderWriter(final String filePath) {
-        this.filePath = filePath;
+        this.filepath = Paths.get(filePath);
+        this.isPathExists = Files.exists(filepath);
+        this.isFilePathChanged = false;
+        ensureParentDirectory();
     }
 
     /**
@@ -37,10 +48,12 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
     @Override
     public boolean read() {
         var success = false;
+        if (!pathExists())  {
+            createPath();
+            return success;
+        }
 
-        try (final var bufferedReader =
-                     new BufferedReader(new java.io.FileReader(filePath))
-        ) {
+        try (final var bufferedReader = Files.newBufferedReader(filepath)) {
             String fileLine = null;
             while ((fileLine = bufferedReader.readLine()) != null) {
                 fileLine = fileLine.trim();
@@ -60,6 +73,7 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
         return success;
     }
 
+
     /**
      * Writes {@code items} to the file. Each item is passed through {@link #onWriteLine}
      * before being written, allowing subclasses to transform it.
@@ -72,9 +86,9 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
     public boolean write(List<String> items, final boolean isAppended) {
         var success = false;
 
-        try (final var bufferedWriter
-                     = new BufferedWriter(new FileWriter(filePath, isAppended))
-        ) {
+        try (final BufferedWriter bufferedWriter = isAppended
+                ? Files.newBufferedWriter(filepath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
+                : Files.newBufferedWriter(filepath)) {
             if (isAppended)
                 bufferedWriter.newLine();
 
@@ -94,7 +108,35 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
     }
 
 
+//    protected Instant getFileLastModifiedDate() {
+//        try {
+//            return Files.getLastModifiedTime(filepath).toInstant();
+//        } catch (java.nio.file.NoSuchFileException e) {
+//            onError("File does not exist. No reason to check modified date");
+//            return null;
+//        } catch (IOException e) {
+//            onError("Error grabbing file's Last Modified Date: " + e.getMessage());
+//            return null;
+//        }
+//    }
+
+
+    protected Path getFilepath() {
+        return filepath;
+    }
+
+
+    protected boolean pathExists() {
+        if (!isFilePathChanged)
+            return isPathExists;
+
+        isFilePathChanged = false;
+        return isPathExists = Files.exists(filepath);
+    }
+
+
     /**
+     *
      * Called when a read or write operation fails. Defaults to logging via {@link Logger}.
      * Subclasses that cannot safely call {@link Logger} should override this
      *
@@ -123,4 +165,34 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
 
     /** Called for each non-empty trimmed line during {@link #read}. */
     protected abstract void onReadLine(final String line);
+
+    protected void setFilePathChanged() {
+        this.isFilePathChanged = true;
+    }
+
+
+    private void createPath() {
+        try {
+            Files.createFile(filepath);
+            if (AppInfo.IS_DEBUG)
+                System.out.println("File: " + filepath + "Created");
+        } catch (IOException e) {
+            onError("An Error occurred when creating: " + filepath  + e.getMessage());
+        }
+    }
+
+    /**
+     * Creates the parent directory of {@link #filepath} if it does not already exist.
+     */
+    private void ensureParentDirectory() {
+        final var parent = filepath.getParent();
+        if (parent == null)
+            return;
+
+        try {
+            Files.createDirectories(parent);
+        } catch (IOException e) {
+            onError("Error creating directory '" + parent + "': " + e.getMessage());
+        }
+    }
 }
