@@ -133,7 +133,8 @@ public class MainForm extends JFrame {
     private void onShutdown() {
         config.set(ConfigKey.SCREEN_WIDTH,  getWidth());
         config.set(ConfigKey.SCREEN_HEIGHT, getHeight());
-        Logger.getInstance().logDebug("Saving config on exit, size: " + getWidth() + "x" + getHeight());
+        Logger.getInstance().logDebug("Saving config before exiting.\t" +
+                "Saved Window size: " + getWidth() + "x" + getHeight());
         config.save();
     }
 
