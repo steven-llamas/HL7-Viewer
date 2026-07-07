@@ -133,7 +133,7 @@ public class OptionsView implements IView {
         Theme.GRID_COLOR  = tertiaryColor;
         Theme.TEXT_COLOR      = textColor;
 
-        Logger.getInstance().logDebug("Settings saved");
+        Logger.getInstance().logInfo("Settings saved");
         JOptionPane.showMessageDialog(null,
                 "Settings saved.",
                 "Saved", JOptionPane.INFORMATION_MESSAGE);

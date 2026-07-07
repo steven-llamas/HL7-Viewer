@@ -23,7 +23,7 @@ public class MainForm extends JFrame {
     public MainForm(final IniConfig config) {
         this.config = config;
 
-        setTitle("HL7 Viewer");
+        setTitle(AppInfo.APP_NAME);
         int screenWidth  = config.get(ConfigKey.SCREEN_WIDTH,  1000);
         int screenHeight = config.get(ConfigKey.SCREEN_HEIGHT, 600);
 
@@ -133,8 +133,7 @@ public class MainForm extends JFrame {
     private void onShutdown() {
         config.set(ConfigKey.SCREEN_WIDTH,  getWidth());
         config.set(ConfigKey.SCREEN_HEIGHT, getHeight());
-        Logger.getInstance().logDebug("Saving config before exiting.\t" +
-                "Saved Window size: " + getWidth() + "x" + getHeight());
+        Logger.getInstance().logInfo("Saving config on exit, window size: " + getWidth() + "x" + getHeight());
         config.save();
     }
 

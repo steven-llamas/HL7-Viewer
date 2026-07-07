@@ -31,7 +31,7 @@ public class BasicMessageParser implements IHL7Parser {
                 HL7Validator.validateStructure(message, config.get(IGNORE_MSH_CHECK, false));
         if (!validPair.first()) {
             final var errorMsg = validPair.second();
-            Logger.getInstance().logError(errorMsg);
+            Logger.getInstance().logDebug(errorMsg);
             throw new IllegalArgumentException(errorMsg);
         }
 
@@ -99,7 +99,7 @@ public class BasicMessageParser implements IHL7Parser {
             }
             hl7Msg.add(hl7Seg);
         }
-        Logger.getInstance().logDebug("Parse complete, segment count: " + hl7Msg.getItems().size());
+        Logger.getInstance().logInfo("Parse complete, segment count: " + hl7Msg.getItems().size());
         return hl7Msg;
     }
 

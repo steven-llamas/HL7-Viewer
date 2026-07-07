@@ -30,10 +30,12 @@ public class Main {
         final var config = new IniConfig(rw);
         Theme.loadFromConfig(config);
 
-        Logger.configure(new LoggerIO(), config);
-        Logger.getInstance().logDebug("Logger configured, log level: " +
+        final var logIO = new LoggerIO();
+        Logger.configure(logIO, config, AppInfo.APP_NAME);
+        logIO.logPending();
+        rw.logPending();
+        Logger.getInstance().logInfo("Logger configured, log level: " +
                 Logger.LogLevel.toLogLevel(config.get(ConfigKey.LOG_LEVEL, Logger.LogLevel.ERROR.level)).toString());
-
         final var program = new MainForm(config);
         SwingUtilities.invokeLater(() -> program.setVisible(true));
     }

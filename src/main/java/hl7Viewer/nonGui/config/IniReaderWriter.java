@@ -1,6 +1,5 @@
 package hl7Viewer.nonGui.config;
 
-import hl7Viewer.AppInfo;
 import hl7Viewer.nonGui.AbstractFileReaderWriter;
 import hl7Viewer.nonGui.Logger;
 
@@ -34,7 +33,7 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
         }
     }
 
-
+    private static String DEFAULT_CONFIG_PATH = "config.ini";
 
     private String sectionHeader;
 
@@ -47,7 +46,7 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
      *
      */
     public IniReaderWriter() {
-        super(AppInfo.CONFIG_PATH);
+        super(DEFAULT_CONFIG_PATH);
     }
 
     /**
@@ -113,13 +112,9 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
                 final var configKey = IniConfig.makeMapKey(sectionHeader, key);
                 outConfigMap.putIfAbsent(configKey, value);
 
-                final var msg = "Config loaded: " + configKey + " = " + value;
-                try {
-                    Logger.getInstance().logTrace(msg);
-                } catch (IllegalStateException ignored) {
-                    if (AppInfo.IS_DEBUG)
-                        System.out.println(msg);
-                }
+                addPending("Config loaded: " + configKey + " = " + value,
+                        m -> Logger.getInstance().logTrace(m));
+
             }
         }
     }
