@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -14,6 +13,8 @@ import static hl7Viewer.nonGui.config.IniConfigTestHelper.emptyConfig;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoggerTest {
+
+    private static final int SLEEP_MS = 300;
 
     private static void resetSingleton() throws ReflectiveOperationException {
         final var field = Logger.class.getDeclaredField("loggerInstance");
@@ -116,7 +117,7 @@ class LoggerTest {
             Logger.getInstance().logDebug("debug");
             Logger.getInstance().logInfo("info");
 
-            Thread.sleep(150);
+            Thread.sleep(SLEEP_MS);
 
             assertTrue(io.written.isEmpty(), "No messages below ERROR should be written");
         }
@@ -130,7 +131,7 @@ class LoggerTest {
             Logger.getInstance().logError("error");
             Logger.getInstance().logFatal("fatal");
 
-            Thread.sleep(150);
+            Thread.sleep(SLEEP_MS);
 
             assertEquals(2, io.written.size());
         }
@@ -143,7 +144,7 @@ class LoggerTest {
 
             Logger.getInstance().logInfo("hello");
 
-            Thread.sleep(150);
+            Thread.sleep(SLEEP_MS);
 
             assertTrue(io.written.stream().anyMatch(l -> l.contains("|INFO|")));
         }
@@ -156,7 +157,7 @@ class LoggerTest {
 
             Logger.getInstance().logInfo("hello");
 
-            Thread.sleep(150);
+            Thread.sleep(SLEEP_MS);
 
             assertTrue(io.written.stream().anyMatch(l -> l.contains("MyApp")));
         }
@@ -169,7 +170,7 @@ class LoggerTest {
 
             Logger.getInstance().logInfo("check caller");
 
-            Thread.sleep(150);
+            Thread.sleep(SLEEP_MS);
 
             assertTrue(io.written.stream().anyMatch(l -> l.contains("log_OutputContainsCallerMethodName()")));
         }

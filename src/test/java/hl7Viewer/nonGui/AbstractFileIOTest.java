@@ -1,10 +1,10 @@
 package hl7Viewer.nonGui;
 
+import hl7Viewer.nonGui.config.IniConfigTestHelper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -118,8 +118,10 @@ class AbstractFileIOTest {
 
         @Test
         @DisplayName("should return false when write fails")
-        void write_ReturnsFalseOnFailure() {
-            final var rw = new ConcreteIO("/invalid_path/test.ini");
+        void write_ReturnsFalseOnFailure(@TempDir Path dir) throws IOException {
+            final var blockingFile = dir.resolve("notadir");
+            Files.writeString(blockingFile, "blocking");
+            final var rw = new ConcreteIO(blockingFile.resolve("test.ini").toString());
 
             assertFalse(rw.write(List.of("line1"), false));
         }
@@ -207,7 +209,7 @@ class AbstractFileIOTest {
         @DisplayName("addPending should call consumer immediately when Logger is already configured")
         void addPending_CallsImmediatelyWhenLoggerConfigured(@TempDir Path dir) throws IOException {
             final var io = new LoggerIO(dir.resolve("log.txt").toString(), 5);
-            Logger.configure(io, hl7Viewer.nonGui.config.IniConfigTestHelper.emptyConfig(dir), "Test");
+            Logger.configure(io, IniConfigTestHelper.emptyConfig(dir), "Test");
 
             final var testFile = dir.resolve("test.ini");
             Files.writeString(testFile, "line1");
