@@ -15,8 +15,9 @@ public class Logger {
     public enum LogLevel {
         TRACE(0),
         DEBUG(1),
-        ERROR(2),
-        FATAL(3);
+        INFO(2),
+        ERROR(3),
+        FATAL(4);
 
         public final int level;
 
@@ -50,6 +51,10 @@ public class Logger {
     private final LoggerIO logIO;
     
     private final IniConfig config;
+
+    private final String appName;
+
+    private boolean isConfigured;
     
     private final BlockingQueue<String> logQueue = new LinkedBlockingQueue<>();
 
@@ -61,12 +66,13 @@ public class Logger {
      * @param logIO   the file writer the logger will append to
      * @param config  app config used to read the active {@link LogLevel}
      */
-    public static void configure(final LoggerIO logIO, final IniConfig config) {
+    public static void configure(final LoggerIO logIO, final IniConfig config, final String appName) {
         if (loggerInstance == null) {
 
             synchronized (Logger.class) {
                 if (loggerInstance == null) {
-                    loggerInstance = new Logger(logIO, config);
+                    loggerInstance = new Logger(logIO, config, appName);
+                    loggerInstance.setConfigured();
                 }
             }
         }
@@ -87,6 +93,22 @@ public class Logger {
 
         return instance;
     }
+
+
+    public boolean isConfigured() {
+        return isConfigured;
+    }
+
+
+    /**
+     * Logs a message at {@link LogLevel#INFO}.
+     *
+     * @param message the text to log
+     */
+    public void logInfo(final String message) {
+        log(message, LogLevel.INFO);
+    }
+
 
     /**
      * Logs a message at {@link LogLevel#TRACE}.
@@ -141,8 +163,8 @@ public class Logger {
 
     private void log(final String message, final LogLevel logLevel) {
         if (logLevel.level >= getConfigLogLevel().level) {
-            final var timestamp = LocalDateTime.now().format(DATE_TIME_FORMAT);
-            final var output = timestamp + " [" + logLevel + "] " + getCaller() + " : " + message;
+            final var dateTimeStamp = LocalDateTime.now().format(DATE_TIME_FORMAT);
+            final var output = dateTimeStamp + "|" + logLevel + "|" + appName + "| " + getCaller() + " : " + message;
 
             try {
                 logQueue.put(output);
@@ -173,9 +195,10 @@ public class Logger {
         }, "LogWriter").start();
     }
 
-    private Logger(final LoggerIO logIO, final IniConfig config) {
+    private Logger(final LoggerIO logIO, final IniConfig config, final String appName) {
         this.logIO = logIO;
         this.config = config;
+        this.appName = appName;
         startLogWriter();
     }
 
@@ -184,5 +207,10 @@ public class Logger {
                 (!AppInfo.IS_DEBUG)
                         ? LogLevel.ERROR.level
                         : LogLevel.TRACE.level));
+    }
+
+
+    private void setConfigured() {
+        isConfigured = true;
     }
 }

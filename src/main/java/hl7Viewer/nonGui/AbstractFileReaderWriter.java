@@ -2,16 +2,19 @@ package hl7Viewer.nonGui;
 
 
 import hl7Viewer.AppInfo;
+import hl7Viewer.utils.Pair;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.time.Instant;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Base class for file-backed readers and writers.
@@ -25,15 +28,22 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
 
     private boolean isFilePathChanged;
 
+    private final List<Pair<String, Consumer<String>>> pendingLogs = new ArrayList<>();
+
 
     /**
-     * Constructs a new {@link  AbstractFileReaderWriter} and sets
-     * its filepath for later methods to use
+     * Constructs a new {@link AbstractFileReaderWriter}.
+     * Resolves {@code filePath} to an absolute path via {@code resolvePath},
+     * checks whether the file already exists, and calls {@link #ensureParentDirectory()}
+     * to create any missing parent directories.
      *
      * @param filePath filepath of where the file is located
+     * @throws NullPointerException if {@code filePath} is null
      */
-    public AbstractFileReaderWriter(final String filePath) {
-        this.filepath = Paths.get(filePath);
+    public AbstractFileReaderWriter(final String filePath) throws NullPointerException {
+        java.util.Objects.requireNonNull(filePath,  getClass().getName() + " filePath cannot be null");
+
+        this.filepath = Paths.get(resolvePath(filePath));
         this.isPathExists = Files.exists(filepath);
         this.isFilePathChanged = false;
         ensureParentDirectory();
@@ -66,7 +76,7 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
 
             success = true;
         } catch (IOException e) {
-            onError("Error reading file: " + e.getMessage());
+            onError("Error reading file to: " + filepath + " message: " + e.getMessage());
             return success;
         }
 
@@ -100,11 +110,22 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
 
             success = true;
         } catch (IOException e) {
-            onError("Error writing file: " + e.getMessage());
+            onError("Error writing file to: " + filepath + " message: " + e.getMessage());
             return success;
         }
 
         return success;
+    }
+
+
+    /** Flushes all pending log messages through their associated log methods and clears the queue. */
+    public void logPending() {
+        String msg = "";
+        for (final var entry : pendingLogs){
+            msg = entry.first();
+            entry.second().accept(msg);
+        }
+        pendingLogs.clear();
     }
 
 
@@ -143,13 +164,22 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
      * @param message error description
      */
     protected void onError(final String message) {
-
-        try {
+        if(Logger.getInstance().isConfigured()) {
             Logger.getInstance().logError(message);
-        } catch (IllegalStateException e) {
-            if (AppInfo.IS_DEBUG)
-                System.err.println(message);
-        }
+        } else if (AppInfo.IS_DEBUG)
+            System.err.println(message);
+    }
+
+
+    /**
+     * Queues a message to be logged once {@link Logger} is configured.
+     * Use when logging is needed before {@link Logger#configure} has been called.
+     *
+     * @param msg      the message to log
+     * @param consumer the log method to invoke (e.g. {@code Logger.getInstance()::logTrace})
+     */
+    protected void addPending(final String msg, final Consumer<String> consumer) {
+        pendingLogs.add(new Pair<>(msg, consumer));
     }
 
 
@@ -166,8 +196,23 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
     /** Called for each non-empty trimmed line during {@link #read}. */
     protected abstract void onReadLine(final String line);
 
+
     protected void setFilePathChanged() {
         this.isFilePathChanged = true;
+    }
+
+
+    private static String  resolvePath(final String filename) {
+        if (AppInfo.IS_DEBUG)
+            return filename;
+
+        try {
+            final var binDir = new File(AppInfo.class.getProtectionDomain()
+                    .getCodeSource().getLocation().toURI()).getParent();
+            return binDir + File.separator + filename;
+        } catch (URISyntaxException e) {
+            return filename;
+        }
     }
 
 
@@ -175,9 +220,10 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
         try {
             Files.createFile(filepath);
             if (AppInfo.IS_DEBUG)
-                System.out.println("File: " + filepath + "Created");
+                System.out.println("File: " + filepath + " Created");
         } catch (IOException e) {
-            onError("An Error occurred when creating: " + filepath  + e.getMessage());
+            final var msg = "An Error occurred when creating: " + filepath + " message: " + e.getMessage();
+            onError(msg);
         }
     }
 
@@ -192,7 +238,8 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
         try {
             Files.createDirectories(parent);
         } catch (IOException e) {
-            onError("Error creating directory '" + parent + "': " + e.getMessage());
+            final var msg = "Error occurred when creating directory: " + parent + " message: " + e.getMessage();
+            onError(msg);
         }
     }
 }
