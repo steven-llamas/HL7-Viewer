@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class LoggerIO extends AbstractFileReaderWriter {
+public class LoggerIO extends AbstractFileIO {
     private static final String ARCHIVE_FOLDER = "Archive";
 
     private static final LocalDate CURRENT_LOCAL_DATE = LocalDate.now();
@@ -59,15 +59,23 @@ public class LoggerIO extends AbstractFileReaderWriter {
 
     private void archiveFiles() {
         final var logsDir = getFilepath().getParent();
+
         if (!Files.exists(logsDir))
             return;
 
         final var archiveFolder = logsDir.resolve(ARCHIVE_FOLDER);
         final var logFiles = logsDir.toFile().listFiles(File::isFile);
-        if (logFiles == null)
+
+        if (logFiles == null || logFiles.length == 0)
             return;
 
-        addPending("Archive started, logs dir: " + logsDir, m -> Logger.getInstance().logDebug(m));
+        final boolean hasFilesToArchive = Arrays.stream(logFiles)
+                .anyMatch(file -> Instant.ofEpochMilli(file.lastModified()).isBefore(archiveCutoffDate));
+
+        if (!hasFilesToArchive)
+            return;
+
+        addPending("Archive started in dir: " + logsDir, m -> Logger.getInstance().logDebug(m));
 
         boolean isArchiveDirNew = false;
         try {
@@ -86,6 +94,7 @@ public class LoggerIO extends AbstractFileReaderWriter {
 
             for (final var file : logFiles) {
                 final var lastModified = Instant.ofEpochMilli(file.lastModified());
+
                 if (!lastModified.isBefore(archiveCutoffDate))
                     continue;
 
@@ -107,8 +116,10 @@ public class LoggerIO extends AbstractFileReaderWriter {
                 movedCount++;
             }
 
-            addPending("Archive complete, files moved: " +
-                    movedCount, m -> Logger.getInstance().logInfo(m));
+            if (movedCount > 0) {
+                addPending("Archive complete, files moved: " +
+                        movedCount, m -> Logger.getInstance().logInfo(m));
+            }
 
         } catch (IOException e) {
             onError("Error archiving files to: " + archiveFolder + " message: " + e.getMessage());
@@ -119,23 +130,28 @@ public class LoggerIO extends AbstractFileReaderWriter {
         var archiveFiles = archiveFolder.toFile().listFiles(File::isFile);
         var count = new AtomicInteger();
 
-        addPending("Reducing archive, current count: " +
-                (archiveFiles != null ? archiveFiles.length : 0) +
-                ", max: " + maxFileCount, m -> Logger.getInstance().logDebug(m));
+        if (archiveFiles != null && archiveFiles.length <= maxFileCount)
+            return;
+
+        final var msg = "Reducing archive, current count: " +
+                (archiveFiles != null ? archiveFiles.length : 0) + ", max: " + maxFileCount;
+        addPending(msg, m -> Logger.getInstance().logDebug(m));
 
         while (archiveFiles != null && archiveFiles.length > maxFileCount) {
             Arrays.stream(archiveFiles)
                     .min(Comparator.comparing(File::getName))
                     .ifPresent(file -> {
                         final var filename = file.getName();
+
                         if (file.delete()) {
                             count.incrementAndGet();
                             addPending("Deleted: " + filename, m -> Logger.getInstance().logTrace(m));
+
                             if (AppInfo.IS_DEBUG)
                                 System.out.println("Deleted: " + filename);
                         } else {
-                            final var msg = "Failed to delete: " + filename;
-                            addPending(msg, m -> Logger.getInstance().logError(m));
+                            final var delMsg = "Failed to delete: " + filename;
+                            addPending(delMsg, m -> Logger.getInstance().logError(m));
                         }
                     });
 

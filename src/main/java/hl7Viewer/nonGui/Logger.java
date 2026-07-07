@@ -43,19 +43,18 @@ public class Logger {
     }
 
 
-    private static DateTimeFormatter DATE_TIME_FORMAT =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    private static int LOG_DEFAULT = (!AppInfo.IS_DEBUG) ? LogLevel.ERROR.level : LogLevel.TRACE.level;
 
     private static volatile Logger loggerInstance;
 
     private final LoggerIO logIO;
     
-    private final IniConfig config;
+    private IniConfig config;
 
     private final String appName;
 
-    private boolean isConfigured;
-    
     private final BlockingQueue<String> logQueue = new LinkedBlockingQueue<>();
 
 
@@ -65,17 +64,20 @@ public class Logger {
      *
      * @param logIO   the file writer the logger will append to
      * @param config  app config used to read the active {@link LogLevel}
+     * @return true if {@link #loggerInstance} was set, false otherwise
      */
-    public static void configure(final LoggerIO logIO, final IniConfig config, final String appName) {
+    public static boolean configure(final LoggerIO logIO, final IniConfig config, final String appName) {
         if (loggerInstance == null) {
 
             synchronized (Logger.class) {
                 if (loggerInstance == null) {
                     loggerInstance = new Logger(logIO, config, appName);
-                    loggerInstance.setConfigured();
+                    return true;
                 }
+
             }
         }
+        return false;
     }
 
 
@@ -95,8 +97,22 @@ public class Logger {
     }
 
 
-    public boolean isConfigured() {
-        return isConfigured;
+    /** Returns {@code true} if {@link #configure} has been called. */
+    public static boolean isConfigured() {
+        return loggerInstance != null;
+    }
+
+
+    /**
+     * Logs at the given level only if the logger is configured. Safe to call at any time.
+     *
+     * @param level   the log level
+     * @param message the text to log
+     */
+    public static void log(final LogLevel level, final String message) {
+        final var instance = loggerInstance;
+        if (instance != null)
+            instance.log(message, level);
     }
 
 
@@ -162,17 +178,20 @@ public class Logger {
 
 
     private void log(final String message, final LogLevel logLevel) {
-        if (logLevel.level >= getConfigLogLevel().level) {
+        if (logLevel.level >= getConfigLogLevel()) {
             final var dateTimeStamp = LocalDateTime.now().format(DATE_TIME_FORMAT);
-            final var output = dateTimeStamp + "|" + logLevel + "|" + appName + "| " + getCaller() + " : " + message;
+            final var output = dateTimeStamp + "|" + logLevel + "|" + appName + "| " + getCaller() + ": " + message;
 
             try {
                 logQueue.put(output);
             } catch (InterruptedException e) {
+                if(AppInfo.IS_DEBUG)
+                    System.out.println("Exception when logging, message: " + e.getMessage());
                 Thread.currentThread().interrupt();
             }
         }
     }
+
 
     /**
      * Starts the background {@code LogWriter} thread.
@@ -189,11 +208,14 @@ public class Logger {
                     logIO.write(batch, true);
                     batch.clear();
                 } catch (InterruptedException e) {
+                    if(AppInfo.IS_DEBUG)
+                        System.out.println("Exception in startLogWriter(), message: " + e.getMessage());
                     Thread.currentThread().interrupt();
                 }
             }
         }, "LogWriter").start();
     }
+
 
     private Logger(final LoggerIO logIO, final IniConfig config, final String appName) {
         this.logIO = logIO;
@@ -202,15 +224,8 @@ public class Logger {
         startLogWriter();
     }
 
-    private LogLevel getConfigLogLevel() {
-        return LogLevel.toLogLevel(config.get(ConfigKey.LOG_LEVEL,
-                (!AppInfo.IS_DEBUG)
-                        ? LogLevel.ERROR.level
-                        : LogLevel.TRACE.level));
-    }
 
-
-    private void setConfigured() {
-        isConfigured = true;
+    private int getConfigLogLevel() {
+        return config.get(ConfigKey.LOG_LEVEL, LOG_DEFAULT);
     }
 }

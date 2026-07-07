@@ -21,7 +21,7 @@ import java.util.function.Consumer;
  * Handles file I/O and delegates per-line processing to subclasses via
  * {@link #onReadLine} and {@link #onWriteLine}.
  */
-public abstract class AbstractFileReaderWriter implements IFileReader, IFileWriter {
+public abstract class AbstractFileIO implements IFileReader, IFileWriter {
     private Path filepath;
 
     private boolean isPathExists;
@@ -32,7 +32,7 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
 
 
     /**
-     * Constructs a new {@link AbstractFileReaderWriter}.
+     * Constructs a new {@link AbstractFileIO}.
      * Resolves {@code filePath} to an absolute path via {@code resolvePath},
      * checks whether the file already exists, and calls {@link #ensureParentDirectory()}
      * to create any missing parent directories.
@@ -40,7 +40,7 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
      * @param filePath filepath of where the file is located
      * @throws NullPointerException if {@code filePath} is null
      */
-    public AbstractFileReaderWriter(final String filePath) throws NullPointerException {
+    public AbstractFileIO(final String filePath) throws NullPointerException {
         java.util.Objects.requireNonNull(filePath,  getClass().getName() + " filePath cannot be null");
 
         this.filepath = Paths.get(resolvePath(filePath));

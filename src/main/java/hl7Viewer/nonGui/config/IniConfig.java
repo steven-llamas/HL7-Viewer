@@ -13,7 +13,7 @@ import java.util.Map;
 public class IniConfig {
     private final Map<String, String> configMap;
 
-    private final IniReaderWriter readerWriter;
+    private final IniIO readerWriter;
 
     private final ArrayList<String> outputList = new ArrayList<>();
 
@@ -21,12 +21,12 @@ public class IniConfig {
     /**
      * Constructs a new {@link  IniConfig}
      *
-     * @param readerWriter {@link IniReaderWriter} object that is then assigned to {@link #readerWriter}.
+     * @param readerWriter {@link IniIO} object that is then assigned to {@link #readerWriter}.
      *          If object has items in its output map we then we construct new map and copy them over,
      *          otherwise the map is empty. then we
      *
      */
-    public IniConfig(final IniReaderWriter readerWriter) {
+    public IniConfig(final IniIO readerWriter) {
         this.readerWriter = readerWriter;
 
         if (readerWriter.outConfigMapHasItems()) {
@@ -40,7 +40,7 @@ public class IniConfig {
 
     /** Builds the internal map key used to store and look up a section/key pair. */
     public static String makeMapKey(final String section, final String key) {
-        return section + IniReaderWriter.IniTokens.KEY_SEPARATOR.value + key;
+        return section + IniIO.IniTokens.KEY_SEPARATOR.value + key;
     }
 
 
@@ -118,13 +118,15 @@ public class IniConfig {
      * @return bool depending on whether {@code IniReaderWriter.write()} is successful*/
     public boolean save() {
         if(configMap.isEmpty()) {
-            Logger.getInstance().logDebug("Config save skipped, map empty");
+            if (Logger.isConfigured())
+                Logger.getInstance().logDebug("Config save skipped, map empty");
             return true;
         }
 
         buildOutputList();
         final var success = readerWriter.write(outputList, false);
-        Logger.getInstance().logInfo(success ? "Config saved" : "Config save failed");
+        if (Logger.isConfigured())
+            Logger.getInstance().logInfo(success ? "Config saved" : "Config save failed");
         return success;
     }
 
@@ -132,10 +134,10 @@ public class IniConfig {
     private void buildOutputList() {
         outputList.clear();
 
-        final var keySepValue       = IniReaderWriter.IniTokens.KEY_SEPARATOR.value;
-        final var pairSepValue      = IniReaderWriter.IniTokens.PAIR.value;
-        final var sectionBeginValue = IniReaderWriter.IniTokens.SECTION_BEGIN.value;
-        final var sectionEndValue   = IniReaderWriter.IniTokens.SECTION_END.value;
+        final var keySepValue       = IniIO.IniTokens.KEY_SEPARATOR.value;
+        final var pairSepValue      = IniIO.IniTokens.PAIR.value;
+        final var sectionBeginValue = IniIO.IniTokens.SECTION_BEGIN.value;
+        final var sectionEndValue   = IniIO.IniTokens.SECTION_END.value;
 
         String currentSection = null;
         for (final var entry : configMap.entrySet()) {

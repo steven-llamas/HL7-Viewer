@@ -1,6 +1,6 @@
 package hl7Viewer.nonGui.config;
 
-import hl7Viewer.nonGui.AbstractFileReaderWriter;
+import hl7Viewer.nonGui.AbstractFileIO;
 import hl7Viewer.nonGui.Logger;
 
 import java.util.LinkedHashMap;
@@ -13,7 +13,7 @@ import java.util.Map;
  * and are intended to be transferred to {@link IniConfig}.
  * Comments and blank lines are discarded on read and are not written back on save.
  */
-public class IniReaderWriter extends AbstractFileReaderWriter {
+public class IniIO extends AbstractFileIO {
 
     /**
      * Character tokens that define the INI file format.
@@ -41,21 +41,21 @@ public class IniReaderWriter extends AbstractFileReaderWriter {
 
 
     /**
-     * Constructs a new {@link  IniReaderWriter} and sets
+     * Constructs a new {@link  IniIO} and sets
      * its parent class filepath as the default {@code config.ini} for later methods to use.
      *
      */
-    public IniReaderWriter() {
+    public IniIO() {
         super(DEFAULT_CONFIG_PATH);
     }
 
     /**
-     * Constructs a new {@link  IniReaderWriter} and sets
+     * Constructs a new {@link  IniIO} and sets
      * parent class filepath for later methods to use.
      *
      * @param filePath filepath of where the file is located
      */
-    IniReaderWriter(final String filePath) {
+    IniIO(final String filePath) {
         super(filePath);
     }
 
