@@ -16,7 +16,7 @@ class IniConfigTest {
     private IniConfig configFrom(Path dir, String content) throws IOException {
         final var file = dir.resolve("config.ini");
         Files.writeString(file, content);
-        final var rw = new IniReaderWriter(file.toString());
+        final var rw = new IniIO(file.toString());
         rw.read();
         return new IniConfig(rw);
     }
@@ -102,7 +102,7 @@ class IniConfigTest {
         void save_WritesContentToFile(@TempDir Path dir) throws IOException {
             final var file = dir.resolve("config.ini");
             Files.writeString(file, "[Application]\nscreen_width=1000");
-            final var rw = new IniReaderWriter(file.toString());
+            final var rw = new IniIO(file.toString());
             rw.read();
             final var config = new IniConfig(rw);
 
@@ -117,7 +117,7 @@ class IniConfigTest {
         void save_DoesNothingWhenEmpty(@TempDir Path dir) throws IOException {
             final var file = dir.resolve("config.ini");
             Files.writeString(file, "; only a comment");
-            final var rw = new IniReaderWriter(file.toString());
+            final var rw = new IniIO(file.toString());
             rw.read();
             final var config = new IniConfig(rw);
 
@@ -137,7 +137,7 @@ class IniConfigTest {
         void save_FirstSectionHasNoLeadingBlankLine(@TempDir Path dir) throws IOException {
             final var file = dir.resolve("config.ini");
             Files.writeString(file, "[Application]\nscreen_width=1000");
-            final var rw = new IniReaderWriter(file.toString());
+            final var rw = new IniIO(file.toString());
             rw.read();
             final var config = new IniConfig(rw);
 
@@ -151,7 +151,7 @@ class IniConfigTest {
         void save_SecondSectionHasLeadingBlankLine(@TempDir Path dir) throws IOException {
             final var file = dir.resolve("config.ini");
             Files.writeString(file, "[Application]\nscreen_width=1000\n[HL7Setting]\nbold_index=true");
-            final var rw = new IniReaderWriter(file.toString());
+            final var rw = new IniIO(file.toString());
             rw.read();
             final var config = new IniConfig(rw);
 

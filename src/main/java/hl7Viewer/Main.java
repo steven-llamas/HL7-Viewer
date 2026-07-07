@@ -2,8 +2,11 @@ package hl7Viewer;
 
 import hl7Viewer.gui.MainForm;
 import hl7Viewer.gui.Theme;
+import hl7Viewer.nonGui.Logger;
+import hl7Viewer.nonGui.LoggerIO;
+import hl7Viewer.nonGui.config.ConfigKey;
 import hl7Viewer.nonGui.config.IniConfig;
-import hl7Viewer.nonGui.config.IniReaderWriter;
+import hl7Viewer.nonGui.config.IniIO;
 
 import javax.swing.SwingUtilities;
 
@@ -11,18 +14,31 @@ public class Main {
     public static void main(String[] args) {
 
         try {
-            runSwingGuiOnEdt();
+            initialize();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            if (AppInfo.IS_DEBUG) {
+                System.err.println(ex);
+                ex.printStackTrace();
+            }
         }
     }
 
-    private static void runSwingGuiOnEdt() {
-        final var rw = new IniReaderWriter();
+    private static void initialize() {
+        final var rw = new IniIO();
         rw.read();
 
         final var config = new IniConfig(rw);
         Theme.loadFromConfig(config);
+
+        final var logIO = new LoggerIO();
+        if (Logger.configure(logIO, config, AppInfo.APP_NAME)) {
+             logIO.logPending();
+             rw.logPending();
+             Logger.getInstance()
+                     .logInfo("Logger configured, log level: " +
+                             Logger.LogLevel.toLogLevel(config.get(ConfigKey.LOG_LEVEL, Logger.LogLevel.ERROR.level)));
+         }
+
         final var program = new MainForm(config);
         SwingUtilities.invokeLater(() -> program.setVisible(true));
     }

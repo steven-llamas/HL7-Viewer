@@ -1,7 +1,7 @@
 package hl7Viewer.nonGui.hl7Parser;
 
 import hl7Viewer.nonGui.config.IniConfig;
-import hl7Viewer.nonGui.config.IniReaderWriter;
+import hl7Viewer.nonGui.config.IniIO;
 import hl7Viewer.utils.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -92,7 +92,7 @@ class HL7MessageTest {
 
         @BeforeEach
         void setUp() {
-            final var parser = new BasicMessageParser(new IniConfig(new IniReaderWriter()));
+            final var parser = new BasicMessageParser(new IniConfig(new IniIO()));
             final String validHl7Message = """
                     MSH|^~\\&|TEST|TEST|  Lab_System  |Lab_Dept|202603051000||ADT^A04|32143214321|P|2.3
                     PID|||PI12345||DOE^JOHN^||19800101|M|||123 MAIN ST&APT 4B&METROPOLIS^OH^44123||(555)555-1212~(555)555-1313|||S|
