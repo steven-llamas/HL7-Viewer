@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class IniReaderWriterTest {
 
-    private IniReaderWriter readerWriterFrom(Path dir, String content) throws IOException {
+    private IniIO readerWriterFrom(Path dir, String content) throws IOException {
         final var file = dir.resolve("config.ini");
         Files.writeString(file, content);
-        final var rw = new IniReaderWriter(file.toString());
+        final var rw = new IniIO(file.toString());
         rw.read();
         return rw;
     }

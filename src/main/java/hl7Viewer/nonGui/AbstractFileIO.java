@@ -164,9 +164,9 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
      * @param message error description
      */
     protected void onError(final String message) {
-        if(Logger.getInstance().isConfigured()) {
+        if (Logger.isConfigured())
             Logger.getInstance().logError(message);
-        } else if (AppInfo.IS_DEBUG)
+        else if (AppInfo.IS_DEBUG)
             System.err.println(message);
     }
 
@@ -179,7 +179,10 @@ public abstract class AbstractFileReaderWriter implements IFileReader, IFileWrit
      * @param consumer the log method to invoke (e.g. {@code Logger.getInstance()::logTrace})
      */
     protected void addPending(final String msg, final Consumer<String> consumer) {
-        pendingLogs.add(new Pair<>(msg, consumer));
+        if (Logger.isConfigured())
+            consumer.accept(msg);
+        else
+            pendingLogs.add(new Pair<>(msg, consumer));
     }
 
 

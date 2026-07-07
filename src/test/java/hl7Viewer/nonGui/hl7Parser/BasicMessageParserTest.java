@@ -1,7 +1,7 @@
 package hl7Viewer.nonGui.hl7Parser;
 
 import hl7Viewer.nonGui.config.IniConfig;
-import hl7Viewer.nonGui.config.IniReaderWriter;
+import hl7Viewer.nonGui.config.IniIO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,7 +15,7 @@ class BasicMessageParserTest {
     private BasicMessageParser parser;
 
     private static BasicMessageParser defaultParser() {
-        return new BasicMessageParser(new IniConfig(new IniReaderWriter()));
+        return new BasicMessageParser(new IniConfig(new IniIO()));
     }
 
     @BeforeEach
