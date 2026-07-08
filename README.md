@@ -20,7 +20,17 @@ The program is written in Java (ver. 24) and uses the Java Swing for the GUI.
 
 - Java 24+
 - Maven 3.9
-- Java IDE
+- Java IDE (IntelliJ IDEA recommended)
+
+## Code Style
+
+This project uses [Spotless](https://github.com/diffplug/spotless) to enforce basic formatting rules (trailing whitespace and end-of-file newlines). It runs automatically during `mvn verify` and fails the build if any file is out of compliance. To auto-fix violations run:
+
+```bash
+  mvn spotless:apply
+```
+
+The full code style (blank lines, brace placement, spacing inside parentheses, etc.) is defined in `.idea/codeStyles/Project.xml` and applied automatically by IntelliJ IDEA. When opening the project, IntelliJ will pick up these settings — no manual configuration needed.
 
 ## Installation
 1. Clone the repo  
