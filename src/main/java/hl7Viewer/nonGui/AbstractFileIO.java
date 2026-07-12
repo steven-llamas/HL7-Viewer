@@ -2,6 +2,7 @@ package hl7Viewer.nonGui;
 
 
 import hl7Viewer.AppInfo;
+import hl7Viewer.OsType;
 import hl7Viewer.utils.Pair;
 
 import java.io.BufferedWriter;
@@ -22,7 +23,14 @@ import java.util.function.Consumer;
  * {@link #onReadLine} and {@link #onWriteLine}.
  */
 public abstract class AbstractFileIO implements IFileReader, IFileWriter {
-    private Path filepath;
+    private static final String BASE_PATH = File.separator + AppInfo.APP_NAME + File.separator;
+
+    private static final String WINDOWS_APPDATA = System.getenv("APPDATA");
+
+    private static final String MAC_APP_SUPPORT = System.getProperty("user.home") + "/Library/Application Support";
+
+
+    private final Path filepath;
 
     private boolean isPathExists;
 
@@ -40,10 +48,10 @@ public abstract class AbstractFileIO implements IFileReader, IFileWriter {
      * @param filePath filepath of where the file is located
      * @throws NullPointerException if {@code filePath} is null
      */
-    public AbstractFileIO(final String filePath) throws NullPointerException {
-        java.util.Objects.requireNonNull(filePath,  getClass().getName() + " filePath cannot be null");
+    protected AbstractFileIO(final String filePath) throws NullPointerException {
+        java.util.Objects.requireNonNull(filePath, getClass().getName() + " filePath cannot be null");
 
-        this.filepath = Paths.get(resolvePath(filePath));
+        this.filepath = resolvePath(filePath);
         this.isPathExists = Files.exists(filepath);
         this.isFilePathChanged = false;
         ensureParentDirectory();
@@ -58,7 +66,8 @@ public abstract class AbstractFileIO implements IFileReader, IFileWriter {
     @Override
     public boolean read() {
         var success = false;
-        if (!pathExists())  {
+
+        if (!pathExists()) {
             createPath();
             return success;
         }
@@ -76,7 +85,7 @@ public abstract class AbstractFileIO implements IFileReader, IFileWriter {
 
             success = true;
         } catch (IOException e) {
-            onError("Error reading file to: " + filepath + " message: " + e.getMessage());
+            onError("Error reading file to: '" + filepath + "' message: " + e.getMessage());
             return success;
         }
 
@@ -110,7 +119,7 @@ public abstract class AbstractFileIO implements IFileReader, IFileWriter {
 
             success = true;
         } catch (IOException e) {
-            onError("Error writing file to: " + filepath + " message: " + e.getMessage());
+            onError("Error writing file to: '" + filepath + "' message: " + e.getMessage());
             return success;
         }
 
@@ -118,28 +127,17 @@ public abstract class AbstractFileIO implements IFileReader, IFileWriter {
     }
 
 
-    /** Flushes all pending log messages through their associated log methods and clears the queue. */
+    /**
+     * Flushes all pending log messages through their associated log methods and clears the queue.
+     */
     public void logPending() {
         String msg = "";
-        for (final var entry : pendingLogs){
+        for (final var entry : pendingLogs) {
             msg = entry.first();
             entry.second().accept(msg);
         }
         pendingLogs.clear();
     }
-
-
-//    protected Instant getFileLastModifiedDate() {
-//        try {
-//            return Files.getLastModifiedTime(filepath).toInstant();
-//        } catch (java.nio.file.NoSuchFileException e) {
-//            onError("File does not exist. No reason to check modified date");
-//            return null;
-//        } catch (IOException e) {
-//            onError("Error grabbing file's Last Modified Date: " + e.getMessage());
-//            return null;
-//        }
-//    }
 
 
     protected Path getFilepath() {
@@ -186,8 +184,10 @@ public abstract class AbstractFileIO implements IFileReader, IFileWriter {
     }
 
 
-    /** Called for each item just before it is written during {@link #write}.
-     *  Child classes can override to add functionality if needed
+    /**
+     * Called for each item just before it is written during {@link #write}.
+     * Child classes can override to add functionality if needed
+     *
      * @param line the string item from the list
      * @return String base method returns the string
      */
@@ -196,7 +196,9 @@ public abstract class AbstractFileIO implements IFileReader, IFileWriter {
     }
 
 
-    /** Called for each non-empty trimmed line during {@link #read}. */
+    /**
+     * Called for each non-empty trimmed line during {@link #read}.
+     */
     protected abstract void onReadLine(final String line);
 
 
@@ -205,29 +207,50 @@ public abstract class AbstractFileIO implements IFileReader, IFileWriter {
     }
 
 
-    private static String  resolvePath(final String filename) {
-        if (AppInfo.IS_DEBUG)
-            return filename;
+    private Path resolvePath(final String filename) {
+        final var path = Paths.get(filename);
+        final Path resolved;
 
-        try {
-            final var binDir = new File(AppInfo.class.getProtectionDomain()
-                    .getCodeSource().getLocation().toURI()).getParent();
-            return binDir + File.separator + filename;
-        } catch (URISyntaxException e) {
-            return filename;
+        if (AppInfo.IS_DEBUG){
+            resolved = path;
         }
+        else {
+            File dir;
+            final var parent = path.getParent();
+            final var basePath = (parent != null)
+                    ? BASE_PATH + parent + File.separator
+                    : BASE_PATH;
+
+            switch (OsType.TYPE) {
+                case WINDOWS -> dir = new File(WINDOWS_APPDATA + basePath);
+                case MAC     -> dir = new File(MAC_APP_SUPPORT + basePath);
+                default      -> {
+                    try {
+                        dir = new File(AppInfo.class.getProtectionDomain()
+                                .getCodeSource().getLocation().toURI()).getParentFile();
+                        dir = new File(dir + basePath);
+                    } catch (URISyntaxException _) {
+                        return path;
+                    }
+                }
+            }
+
+            resolved = dir.toPath().resolve(path.getFileName());
+        }
+        addPending("Final path: '" + resolved + "'", m -> Logger.getInstance().logDebug(m));
+        return resolved;
     }
 
 
     private void createPath() {
         try {
             Files.createFile(filepath);
-            if (AppInfo.IS_DEBUG)
-                System.out.println("File: " + filepath + " Created");
         } catch (IOException e) {
-            final var msg = "An Error occurred when creating: " + filepath + " message: " + e.getMessage();
+            final var msg = "An Error occurred when creating: '" + filepath + "' message: " + e.getMessage();
             onError(msg);
         }
+
+        addPending("File: '" + filepath + "' Created", m -> Logger.getInstance().logInfo(m));
     }
 
     /**
@@ -241,7 +264,7 @@ public abstract class AbstractFileIO implements IFileReader, IFileWriter {
         try {
             Files.createDirectories(parent);
         } catch (IOException e) {
-            final var msg = "Error occurred when creating directory: " + parent + " message: " + e.getMessage();
+            final var msg = "Error occurred when creating directory: '" + parent + "' message: " + e.getMessage();
             onError(msg);
         }
     }
