@@ -1,6 +1,7 @@
 package hl7Viewer.gui;
 
 import hl7Viewer.AppInfo;
+import hl7Viewer.OsType;
 import hl7Viewer.nonGui.Logger;
 import hl7Viewer.nonGui.config.IniConfig;
 import hl7Viewer.nonGui.hl7Parser.*;
@@ -60,7 +61,7 @@ public class HL7ParseViewer implements IView {
 
 
     private static boolean pressedCtrlAndEnter(KeyEvent e) {
-        final var buttonHeld = AppInfo.IS_MAC_OS
+        final var buttonHeld = (OsType.TYPE == OsType.MAC)
                 ? e.isMetaDown()
                 : e.isControlDown();
         return buttonHeld && e.getKeyCode() == KeyEvent.VK_ENTER;

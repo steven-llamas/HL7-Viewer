@@ -2,6 +2,7 @@ package hl7Viewer.gui;
 
 
 import hl7Viewer.AppInfo;
+import hl7Viewer.OsType;
 import hl7Viewer.nonGui.Logger;
 import hl7Viewer.nonGui.config.ConfigKey;
 import hl7Viewer.nonGui.config.IniConfig;
@@ -32,7 +33,7 @@ public class MainForm extends JFrame {
         setImageIcon();
         setWarningOnExit();
 
-        if (AppInfo.IS_MAC_OS) {
+        if (OsType.TYPE == OsType.MAC) {
             System.setProperty("apple.awt.application.name", "HL7 Viewer");
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
@@ -79,10 +80,10 @@ public class MainForm extends JFrame {
         appIcon = image.getImage();
         setIconImage(appIcon);
 
-        if (AppInfo.IS_MAC_OS){
+        if (OsType.TYPE == OsType.MAC){
             try {
                 Taskbar.getTaskbar().setIconImage(appIcon);
-            } catch (UnsupportedOperationException e) {
+            } catch (UnsupportedOperationException _) {
                 // do nothing
             }
         }
