@@ -104,16 +104,16 @@ public class Logger {
 
 
     /**
-     * Logs at the given level only if the logger is configured. Safe to call at any time.
+     * Logs at the given level only if the logger is configured.
      *
      * @param level   the log level
      * @param message the text to log
      */
-    public static void log(final LogLevel level, final String message) {
-        final var instance = loggerInstance;
-        if (instance != null)
-            instance.log(message, level);
-    }
+//    public static void log(final LogLevel level, final String message) {
+//        final var instance = loggerInstance;
+//        if (instance != null)
+//            instance.log(message, level);
+//    }
 
 
     /**
