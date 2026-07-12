@@ -207,20 +207,27 @@ public abstract class AbstractFileIO implements IFileReader, IFileWriter {
     }
 
 
+    /**
+     * Resolves {@code filename} to its absolute path. In debug mode returns the path as-is;
+     * otherwise maps it under the OS-specific user data directory ({@code %APPDATA%} on Windows,
+     * {@code ~/Library/Application Support} on Mac, or next to the JAR on other platforms).
+     *
+     * @param filename relative filename, optionally including a subdirectory (e.g. {@code logs/app.log})
+     * @return the resolved absolute {@link Path}
+     */
     private Path resolvePath(final String filename) {
         final var path = Paths.get(filename);
         final Path resolved;
 
-        if (AppInfo.IS_DEBUG){
+        if (AppInfo.IS_DEBUG) {
             resolved = path;
-        }
-        else {
-            File dir;
+        } else {
             final var parent = path.getParent();
             final var basePath = (parent != null)
                     ? BASE_PATH + parent + File.separator
                     : BASE_PATH;
 
+            File dir;
             switch (OsType.TYPE) {
                 case WINDOWS -> dir = new File(WINDOWS_APPDATA + basePath);
                 case MAC     -> dir = new File(MAC_APP_SUPPORT + basePath);
@@ -234,7 +241,6 @@ public abstract class AbstractFileIO implements IFileReader, IFileWriter {
                     }
                 }
             }
-
             resolved = dir.toPath().resolve(path.getFileName());
         }
         addPending("Final path: '" + resolved + "'", m -> Logger.getInstance().logDebug(m));

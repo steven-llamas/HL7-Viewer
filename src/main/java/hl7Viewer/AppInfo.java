@@ -11,7 +11,7 @@ public final class AppInfo {
 
     public static final String BUILD_TYPE = isJar() ? "Release" : "Debug";
 
-    public static final boolean IS_DEBUG = !isJar();
+    public static boolean IS_DEBUG = !isJar();
 
 
     private static boolean isJar() {

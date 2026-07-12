@@ -1,16 +1,20 @@
 package hl7Viewer.nonGui;
 
+import hl7Viewer.AppInfo;
+import hl7Viewer.OsType;
 import hl7Viewer.nonGui.config.IniConfigTestHelper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
 
 class AbstractFileIOTest {
 
@@ -150,8 +154,10 @@ class AbstractFileIOTest {
         }
 
         @BeforeEach
-        void reset() throws ReflectiveOperationException {
+        void reset(@TempDir Path dir) throws ReflectiveOperationException, IOException {
             resetLoggerSingleton();
+            Logger.configure(new LoggerIO(dir.resolve("log.txt").toString(), 5),
+                    IniConfigTestHelper.emptyConfig(dir), "Test");
         }
 
         @AfterEach
@@ -161,7 +167,8 @@ class AbstractFileIOTest {
 
         @Test
         @DisplayName("addPending should queue message when Logger is not configured")
-        void addPending_QueuesWhenLoggerNotConfigured(@TempDir Path dir) throws IOException {
+        void addPending_QueuesWhenLoggerNotConfigured(@TempDir Path dir) throws IOException, ReflectiveOperationException {
+            resetLoggerSingleton();
             final var file = dir.resolve("test.ini");
             Files.writeString(file, "line1");
             final var rw = new ConcreteIO(file.toString());
@@ -245,6 +252,64 @@ class AbstractFileIOTest {
             Files.writeString(file, "existing");
 
             assertDoesNotThrow(() -> new ConcreteIO(file.toString()));
+        }
+    }
+
+
+    @Nested
+    @DisplayName("When resolving OS-specific path")
+    class OsPathTests {
+
+        private Field isDebugField;
+
+        @BeforeEach
+        void disableDebugMode() throws Exception {
+            isDebugField = AppInfo.class.getDeclaredField("IS_DEBUG");
+            isDebugField.setAccessible(true);
+            isDebugField.setBoolean(null, false);
+        }
+
+        @AfterEach
+        void restoreDebugMode() throws Exception {
+            isDebugField.setBoolean(null, true);
+        }
+
+        @Test
+        @DisplayName("should place file under APP_NAME subdirectory")
+        void resolvePath_PlacesFileUnderAppNameDir() {
+            final var io = new ConcreteIO("config.ini");
+            assertTrue(io.getFilepath().toString().contains(AppInfo.APP_NAME));
+        }
+
+        @Test
+        @DisplayName("should use filename as the final path component")
+        void resolvePath_UsesFilenameAsLastComponent() {
+            final var io = new ConcreteIO("config.ini");
+            assertEquals("config.ini", io.getFilepath().getFileName().toString());
+        }
+
+        @Test
+        @DisplayName("should preserve subdirectory in path")
+        void resolvePath_PreservesSubdirectory() {
+            final var io = new ConcreteIO("logs/app.log");
+            assertTrue(io.getFilepath().toString().contains("logs"));
+            assertEquals("app.log", io.getFilepath().getFileName().toString());
+        }
+
+        @Test
+        @DisplayName("should use APPDATA root on Windows")
+        void resolvePath_UsesAppDataOnWindows() {
+            assumeTrue(OsType.TYPE == OsType.WINDOWS, "Only runs on Windows");
+            final var io = new ConcreteIO("config.ini");
+            assertTrue(io.getFilepath().toString().startsWith(System.getenv("APPDATA")));
+        }
+
+        @Test
+        @DisplayName("should use Library/Application Support root on Mac")
+        void resolvePath_UsesLibraryOnMac() {
+            assumeTrue(OsType.TYPE == OsType.MAC, "Only runs on Mac");
+            final var expected = System.getProperty("user.home") + "/Library/Application Support";
+            assertTrue(new ConcreteIO("config.ini").getFilepath().toString().startsWith(expected));
         }
     }
 }
