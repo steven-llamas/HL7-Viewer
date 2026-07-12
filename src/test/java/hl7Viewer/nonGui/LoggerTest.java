@@ -50,6 +50,23 @@ class LoggerTest {
 
 
     @Nested
+    @DisplayName("When starting the LogWriter thread")
+    class LogWriterThreadTests {
+
+        @Test
+        @DisplayName("LogWriter should run on a virtual thread")
+        void logWriter_IsVirtualThread(@TempDir Path dir) throws IOException {
+            Logger.configure(new CapturingLoggerIO(dir), emptyConfig(dir), "Test");
+
+            final var thread = Logger.getInstance().logWriterThread;
+
+            assertNotNull(thread, "LogWriter thread should exist");
+            assertTrue(thread.isVirtual(), "LogWriter should be a virtual thread");
+        }
+    }
+
+
+    @Nested
     @DisplayName("When checking configuration state")
     class IsConfiguredTests {
 

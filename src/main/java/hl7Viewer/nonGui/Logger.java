@@ -49,11 +49,15 @@ public class Logger {
 
     private static volatile Logger loggerInstance;
 
+    static final String LOG_WRITER_THREAD_NAME = "LogWriter";
+
     private final LoggerIO logIO;
     
     private IniConfig config;
 
     private final String appName;
+
+    Thread logWriterThread;
 
     private final BlockingQueue<String> logQueue = new LinkedBlockingQueue<>();
 
@@ -199,7 +203,7 @@ public class Logger {
      * message is available, then drains the rest and writes the batch in one file append.
      */
     private void startLogWriter() {
-        new Thread(() -> {
+        logWriterThread = Thread.ofVirtual().name(LOG_WRITER_THREAD_NAME).start(() -> {
             final List<String> batch = new ArrayList<>();
             while (!Thread.currentThread().isInterrupted()) {
                 try {
@@ -213,7 +217,7 @@ public class Logger {
                     Thread.currentThread().interrupt();
                 }
             }
-        }, "LogWriter").start();
+        });
     }
 
 
